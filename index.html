@@ -785,7 +785,59 @@ function generateWord(tab){
 
 
 // ===== pdfmake PDF Generator =====
+// Cache for font data
+let _sarabunFont = null;
+
+async function loadSarabunFont(){
+  if(_sarabunFont) return _sarabunFont;
+  try {
+    // Load from local GitHub repo files
+    const resp = await fetch('THSarabun.ttf');
+    if(resp.ok){
+      const buf = await resp.arrayBuffer();
+      const b64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
+      _sarabunFont = b64;
+      return b64;
+    }
+  } catch(e) { console.warn('Font load failed:', e); }
+  return null;
+}
+
+let _sarabunBoldFont = null;
+async function loadSarabunBoldFont(){
+  if(_sarabunBoldFont) return _sarabunBoldFont;
+  try {
+    const resp = await fetch('THSarabun Bold.ttf');
+    if(resp.ok){
+      const buf = await resp.arrayBuffer();
+      const b64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
+      _sarabunBoldFont = b64;
+      return b64;
+    }
+  } catch(e) { console.warn('Bold font load failed:', e); }
+  return null;
+}
+
 async function generatePDFMake(tab, filename){
+  // Load Thai fonts
+  const [fontB64, boldB64] = await Promise.all([loadSarabunFont(), loadSarabunBoldFont()]);
+
+  // Set up fonts
+  if(fontB64){
+    pdfMake.vfs['THSarabun.ttf'] = fontB64;
+    pdfMake.vfs['THSarabunBold.ttf'] = boldB64 || fontB64;
+    pdfMake.fonts = {
+      THSarabun: {
+        normal: 'THSarabun.ttf',
+        bold: 'THSarabunBold.ttf',
+        italics: 'THSarabun.ttf',
+        bolditalics: 'THSarabunBold.ttf'
+      }
+    };
+  }
+
+  const useFont = fontB64 ? 'THSarabun' : 'Roboto';
+
   // Get logo as base64
   let logoDataUrl = null;
   try{
@@ -799,7 +851,6 @@ async function generatePDFMake(tab, filename){
     }
   }catch(e){ console.warn('Logo error:', e); }
 
-  // Get memo data from current state
   const docno = document.getElementById('pdf-docno').textContent || '-';
   const date = document.getElementById('pdf-date').textContent || '';
   const subject = document.getElementById('pdf-subject').textContent || '';
@@ -808,27 +859,28 @@ async function generatePDFMake(tab, filename){
   const closingEl = document.getElementById('pdf-closing');
   const noteEl = document.getElementById('pdf-note');
 
-  // Parse table from pdf-table-wrap
+  // Parse tables
   const tableWrap = document.getElementById('pdf-table-wrap');
   const tables = [];
   tableWrap.querySelectorAll('table').forEach(tbl => {
-    const headers = Array.from(tbl.querySelectorAll('thead th')).map(th => ({text: th.textContent, bold:true, fillColor:'#d0d0d0', alignment:'center'}));
+    const headers = Array.from(tbl.querySelectorAll('thead th')).map(th => ({text: th.textContent.trim(), bold:true, fillColor:'#d0d0d0', alignment:'center', fontSize:9}));
     const bodyRows = Array.from(tbl.querySelectorAll('tbody tr')).map(tr =>
-      Array.from(tr.querySelectorAll('td')).map(td => ({text: td.textContent, alignment: td.classList.contains('tdl')?'left':'center'}))
+      Array.from(tr.querySelectorAll('td')).map(td => ({text: td.textContent.trim(), alignment: td.classList.contains('tdl')?'left':'center', fontSize:9}))
     );
-    const footRows = Array.from(tbl.querySelectorAll('tfoot tr')).map(tr =>
-      Array.from(tr.querySelectorAll('td')).map((td, i, arr) => ({
-        text: td.textContent,
-        bold: true,
-        fillColor: '#ebebeb',
-        alignment: i === arr.length-1 ? 'center' : 'right',
-        colSpan: td.colSpan || 1
-      }))
-    );
-    if(headers.length) tables.push({headers, bodyRows, footRows, colCount: headers.length});
+    const footRows = Array.from(tbl.querySelectorAll('tfoot tr')).map(tr => {
+      const cells = Array.from(tr.querySelectorAll('td'));
+      const row = [];
+      cells.forEach((td, i) => {
+        const cs = parseInt(td.getAttribute('colspan'))||1;
+        row.push({text: td.textContent.trim(), bold:true, fillColor:'#ebebeb', alignment: i===cells.length-1?'center':'right', fontSize:9, colSpan:cs});
+        for(let j=1;j<cs;j++) row.push({});
+      });
+      return row;
+    });
+    if(headers.length) tables.push({headers, bodyRows, footRows, colCount:headers.length});
   });
 
-  // Parse approval box
+  // Parse approval
   const approvalEl = document.getElementById('pdf-approval');
   const cells = approvalEl ? Array.from(approvalEl.querySelectorAll('.mp-appr-cell')) : [];
 
@@ -836,138 +888,100 @@ async function generatePDFMake(tab, filename){
   const acctWrap = document.getElementById('pdf-acct-wrap');
   const acctVisible = acctWrap && acctWrap.style.display !== 'none';
 
-  // Build body content
   const docBody = [];
 
-  // Header row (logo + docno/date)
-  const headerRow = {
+  // Header
+  const hdrContent = {
     columns: [
-      logoDataUrl ? {image: logoDataUrl, width: 80, height: 32} : {text: 'Orbit Digital', bold: true, fontSize: 12},
-      {
-        text: [
-          {text: 'เลขที่ ', fontSize: 10},
-          {text: docno, bold: true, fontSize: 10},
-          '\n',
-          {text: 'ลงวันที่' + date, fontSize: 10}
-        ],
-        alignment: 'right'
-      }
-    ],
-    margin: [0, 0, 0, 10]
+      logoDataUrl ? {image:logoDataUrl, width:70, height:28, margin:[0,0,0,0]} : {text:''},
+      {text:[{text:'เลขที่ ', fontSize:10},{text:docno, bold:true, fontSize:10},'
+',{text:'ลงวันที่'+date, fontSize:10}], alignment:'right'}
+    ], margin:[0,0,0,8]
   };
-  docBody.push(headerRow);
-  docBody.push({canvas:[{type:'line',x1:0,y1:0,x2:515,y2:0,lineWidth:1}], margin:[0,0,0,12]});
+  docBody.push(hdrContent);
+  docBody.push({canvas:[{type:'line',x1:0,y1:0,x2:481,y2:0,lineWidth:0.8,lineColor:'#333'}], margin:[0,0,0,10]});
 
   // Title
-  docBody.push({text: 'บันทึกข้อความ', style: 'title', alignment: 'center', margin:[0,0,0,14]});
+  docBody.push({text:'บันทึกข้อความ', fontSize:16, bold:true, alignment:'center', margin:[0,0,0,12], characterSpacing:1});
 
   // เรื่อง/เรียน
-  docBody.push({columns:[{text:'เรื่อง', bold:true, width:60},{text: subject}], margin:[0,0,0,4]});
-  docBody.push({columns:[{text:'เรียน', bold:true, width:60},{text: to}], margin:[0,0,0,12]});
+  docBody.push({columns:[{text:'เรื่อง', bold:true, width:55, fontSize:10},{text:subject, fontSize:10}], margin:[0,0,0,4]});
+  docBody.push({columns:[{text:'เรียน', bold:true, width:55, fontSize:10},{text:to, fontSize:10}], margin:[0,0,0,10]});
 
-  // Body text
+  // Body
   const bodyText = bodyEl ? bodyEl.innerText.trim() : '';
-  if(bodyText) docBody.push({text: bodyText, margin:[0,0,0,8], lineHeight: 1.5});
+  if(bodyText) docBody.push({text:bodyText, fontSize:10, lineHeight:1.5, margin:[0,0,0,8]});
 
   // Tables
   tables.forEach(t => {
-    const tableBody = [];
-    if(t.headers.length) tableBody.push(t.headers);
-    t.bodyRows.forEach(r => tableBody.push(r));
-    // Handle foot rows with colSpan
-    t.footRows.forEach(row => {
-      const fixedRow = [];
-      row.forEach(cell => {
-        fixedRow.push(cell);
-        for(let i = 1; i < (cell.colSpan||1); i++) fixedRow.push({text:'',border:[false,false,false,false]});
-      });
-      tableBody.push(fixedRow);
-    });
-    docBody.push({
-      table: {headerRows:1, widths: Array(t.colCount).fill('*'), body: tableBody},
-      margin:[0,6,0,6],
-      fontSize: 9
-    });
+    const tableBody = [t.headers, ...t.bodyRows];
+    t.footRows.forEach(r => tableBody.push(r));
+    docBody.push({table:{headerRows:1, widths:Array(t.colCount).fill('*'), body:tableBody}, margin:[0,4,0,6]});
   });
 
   // Note
-  if(noteEl && noteEl.style.display !== 'none'){
-    docBody.push({text: noteEl.innerText.trim(), fontSize: 8, color:'#555', margin:[0,4,0,10], alignment:'center'});
+  if(noteEl && noteEl.style.display !== 'none' && noteEl.innerText.trim()){
+    docBody.push({text:noteEl.innerText.trim(), fontSize:8.5, color:'#444', margin:[0,4,0,8], alignment:'center'});
   }
 
-  // Account table
+  // Account
   if(acctVisible){
-    const acctTables = acctWrap.querySelectorAll('table');
-    acctTables.forEach(tbl => {
-      const hdrs = Array.from(tbl.querySelectorAll('thead th')).map(th=>({text:th.textContent,bold:true,fillColor:'#d0d0d0',alignment:'center'}));
-      const rows = Array.from(tbl.querySelectorAll('tbody tr')).map(tr=>Array.from(tr.querySelectorAll('td')).map(td=>({text:td.textContent,alignment:td.classList.contains('tdl')?'left':'center'})));
-      if(hdrs.length) docBody.push({table:{headerRows:1,widths:Array(hdrs.length).fill('*'),body:[hdrs,...rows]},margin:[0,4,0,8],fontSize:9});
+    acctWrap.querySelectorAll('table').forEach(tbl => {
+      const hdrs = Array.from(tbl.querySelectorAll('thead th')).map(th=>({text:th.textContent.trim(),bold:true,fillColor:'#d0d0d0',alignment:'center',fontSize:9}));
+      const rows = Array.from(tbl.querySelectorAll('tbody tr')).map(tr=>Array.from(tr.querySelectorAll('td')).map(td=>({text:td.textContent.trim(),alignment:td.classList.contains('tdl')?'left':'center',fontSize:9})));
+      if(hdrs.length) docBody.push({table:{headerRows:1,widths:Array(hdrs.length).fill('*'),body:[hdrs,...rows]},margin:[0,4,0,8]});
     });
   }
 
   // Closing
   const closingText = closingEl ? closingEl.innerText.trim() : '';
-  if(closingText) docBody.push({text: closingText, margin:[0,8,0,12], lineHeight:1.5, fontSize:9.5});
+  if(closingText) docBody.push({text:closingText, fontSize:9.5, lineHeight:1.5, margin:[0,8,0,10]});
 
-  // Approval box
+  // Approval table
   if(cells.length === 2){
-    const leftLines = cells[0].innerText.trim().split('\n').filter(l=>l.trim());
-    const rightLines = cells[1].innerText.trim().split('\n').filter(l=>l.trim());
+    const buildCell = (el) => {
+      const lines = el.innerText.trim().split('
+').map(l=>l.trim()).filter(l=>l);
+      const stack = [];
+      // Find where signature line starts (after "o อื่นๆ" line)
+      const sigIdx = lines.findIndex(l => l.startsWith('o อื่นๆ'));
+      const topLines = lines.slice(0, sigIdx > -1 ? sigIdx+1 : Math.min(4, lines.length));
+      const botLines = lines.slice(topLines.length);
+      topLines.forEach(l => stack.push({text:l, fontSize:9, margin:[0,1,0,1]}));
+      stack.push({text:' ', margin:[0,12,0,0]});
+      stack.push({canvas:[{type:'line',x1:10,y1:0,x2:200,y2:0,lineWidth:0.5}]});
+      botLines.forEach(l => stack.push({text:l, fontSize:9, alignment:'center', bold:l.includes('('), margin:[0,1,0,1]}));
+      return {stack, margin:[6,6,6,6]};
+    };
     docBody.push({
-      table:{
-        widths:['50%','50%'],
-        body:[[
-          {
-            stack: [
-              ...leftLines.slice(0,4).map(l=>({text:l, fontSize:9})),
-              {text:' ', margin:[0,20,0,0]},
-              {canvas:[{type:'line',x1:20,y1:0,x2:215,y2:0,lineWidth:0.5}]},
-              ...leftLines.slice(4).map(l=>({text:l, fontSize:9, alignment:'center', bold: l.includes('(')}))
-            ],
-            margin:[8,8,8,8]
-          },
-          {
-            stack: [
-              ...rightLines.slice(0,2).map(l=>({text:l, fontSize:9})),
-              {text:' ', margin:[0,20,0,0]},
-              {canvas:[{type:'line',x1:20,y1:0,x2:215,y2:0,lineWidth:0.5}]},
-              ...rightLines.slice(2).map(l=>({text:l, fontSize:9, alignment:'center', bold: l.includes('(')}))
-            ],
-            margin:[8,8,8,8]
-          }
-        ]]
-      },
-      margin:[0,0,0,0],
-      pageBreak: 'avoid'
+      table:{widths:['50%','50%'], body:[[buildCell(cells[0]), buildCell(cells[1])]]},
+      margin:[0,4,0,0]
     });
   }
 
-  // Build docDefinition
   const docDefinition = {
-    pageSize: 'A4',
-    pageMargins: [57, 85, 57, 70],
-    defaultStyle: { font: 'Roboto', fontSize: 10, lineHeight: 1.4 },
-    styles: { title: { fontSize: 16, bold: true, characterSpacing: 1 } },
-    header: (currentPage, pageCount) => ({
-      columns: [
-        logoDataUrl ? {image: logoDataUrl, width:60, height:24, margin:[57,10,0,0]} : {text:'', margin:[57,10,0,0]},
-        {text:'บริษัท ออร์บิท ดิจิทัล จำกัด', alignment:'right', fontSize:8, color:'#555', margin:[0,14,57,0]}
-      ],
-      margin:[0,0,0,0]
+    pageSize:'A4',
+    pageMargins:[57, 75, 57, 65],
+    defaultStyle:{font:useFont, fontSize:10, lineHeight:1.4},
+    header:(currentPage)=>({
+      columns:[
+        logoDataUrl?{image:logoDataUrl,width:55,height:22,margin:[57,8,0,0]}:{text:'',margin:[57,8,0,0]},
+        {text:'บริษัท ออร์บิท ดิจิทัล จำกัด', alignment:'right', fontSize:8, color:'#555', margin:[0,12,57,0], font:useFont}
+      ]
     }),
-    footer: (currentPage, pageCount) => ({
+    footer:()=>({
       stack:[
         {canvas:[{type:'line',x1:57,y1:0,x2:538,y2:0,lineWidth:0.5,lineColor:'#888'}]},
-        {text:'บริษัท ออร์บิท ดิจิทัล จำกัด', alignment:'center', bold:true, fontSize:9, margin:[0,4,0,0]},
-        {text:'51 ถนนนราธิวาสราชนครินทร์ แขวงสีลม เขตบางรัก กรุงเทพมหานคร', alignment:'center', fontSize:8, color:'#555'}
-      ],
-      margin:[0,4,0,0]
+        {text:'บริษัท ออร์บิท ดิจิทัล จำกัด', alignment:'center', bold:true, fontSize:9, margin:[0,3,0,0], font:useFont},
+        {text:'51 ถนนนราธิวาสราชนครินทร์ แขวงสีลม เขตบางรัก กรุงเทพมหานคร', alignment:'center', fontSize:8, color:'#555', font:useFont}
+      ], margin:[0,4,0,0]
     }),
-    content: docBody
+    content:docBody
   };
 
   pdfMake.createPdf(docDefinition).download(filename);
 }
+
 
 const TAB_PREFIX={sl:'SL',int:'INT',hw:'HW',ent:'ENT',dep:'DEP'};
 const TAB_DATE={sl:'sl-date',int:'int-date',hw:'hw-date',ent:'ent-date',dep:'dep-date'};
