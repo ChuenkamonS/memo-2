@@ -25,6 +25,7 @@ module.exports = async (req, res) => {
     const page = await browser.newPage();
 
     const logoTag = logoBase64
+<<<<<<< codex/add-logo-to-header-and-footer-0vkk7c
       ? `<img src="${logoBase64}" style="height:28px;max-width:110px;object-fit:contain;">`
       : `<span style="font-size:9pt;font-weight:700;">Orbit Digital</span>`;
 
@@ -34,6 +35,17 @@ module.exports = async (req, res) => {
     </div>`;
 
     const footerHtml = `<div style="width:100%;padding:2px 18mm 2px;text-align:center;font-family:sans-serif;font-size:7.5pt;font-weight:700;border-top:0.5px solid #aaa;-webkit-print-color-adjust:exact;background:#fff;line-height:1.25;">
+=======
+      ? `<img src="${logoBase64}" style="height:42px;max-width:150px;object-fit:contain;">`
+      : `<span style="font-size:9pt;font-weight:700;">Orbit Digital</span>`;
+
+    const headerHtml = `<div style="width:100%;padding:5px 20mm 4px;display:flex;justify-content:space-between;align-items:center;font-family:sans-serif;font-size:8pt;border-bottom:0.5px solid #aaa;-webkit-print-color-adjust:exact;background:#fff;">
+      ${logoTag}
+      <span style="color:#555;text-align:right;">บริษัท ออร์บิท ดิจิทัล จำกัด</span>
+    </div>`;
+
+    const footerHtml = `<div style="width:100%;padding:4px 20mm 5px;text-align:center;font-family:sans-serif;font-size:8pt;font-weight:700;border-top:0.5px solid #aaa;-webkit-print-color-adjust:exact;background:#fff;line-height:1.45;">
+>>>>>>> main
       บริษัท ออร์บิท ดิจิทัล จำกัด<br>
       <span style="font-weight:400;color:#555;font-size:7pt">51 ถนนนราธิวาสราชนครินทร์ แขวงสีลม เขตบางรัก กรุงเทพมหานคร</span>
     </div>`;
@@ -42,8 +54,12 @@ module.exports = async (req, res) => {
     <style>
       *{box-sizing:border-box;margin:0;padding:0}
       body{font-family:'TH Sarabun New',sans-serif;font-size:10pt;color:#000;line-height:1.75;padding:0 4px}
+<<<<<<< codex/add-logo-to-header-and-footer-0vkk7c
       #pdf-table-wrap,#pdf-acct-wrap,.mp-table{page-break-inside:avoid;break-inside:avoid}
       table{width:100%;border-collapse:collapse;margin:6px 0;font-size:10pt;page-break-inside:avoid;break-inside:avoid}
+=======
+      table{width:100%;border-collapse:collapse;margin:6px 0;font-size:10pt;page-break-inside:auto}
+>>>>>>> main
       tr{page-break-inside:avoid;break-inside:avoid}
       th{background:#d0d0d0;font-weight:700;text-align:center;padding:4px 8px;border:1px solid #555}
       td{padding:3px 8px;border:1px solid #888;text-align:center}
@@ -66,9 +82,15 @@ module.exports = async (req, res) => {
       .mp-sig-name,.mp-sig-role,.mp-sig-date{text-align:center;font-size:10pt}
       .mp-sig-name{font-weight:700}
       .mp-sig-date{font-size:9pt;color:#666}
+<<<<<<< codex/add-logo-to-header-and-footer-0vkk7c
       .mp-hdr{display:flex;justify-content:flex-end;align-items:flex-start;border-bottom:none;padding-bottom:0;margin-bottom:8px}
       .mp-logo{display:none}
       .mp-hdr-right,.mp-doc-meta{text-align:right;font-size:10pt;line-height:2}
+=======
+      .mp-hdr{display:flex;justify-content:flex-end;align-items:flex-start;border-bottom:none;padding-bottom:0;margin-bottom:14px}
+      .mp-logo{display:none}
+      .mp-hdr-right{text-align:right;font-size:10pt;line-height:2}
+>>>>>>> main
       .num{text-decoration:underline;font-weight:700}
       .mp-footer{display:none}
       .preview-wrap{background:transparent}
@@ -79,7 +101,11 @@ module.exports = async (req, res) => {
     const pdf = await page.pdf({
       format: 'A4',
       printBackground: true,
+<<<<<<< codex/add-logo-to-header-and-footer-0vkk7c
       margin: { top: '20mm', right: '18mm', bottom: '15mm', left: '18mm' },
+=======
+      margin: { top: '32mm', right: '18mm', bottom: '30mm', left: '18mm' },
+>>>>>>> main
       displayHeaderFooter: true,
       headerTemplate: headerHtml,
       footerTemplate: footerHtml,
