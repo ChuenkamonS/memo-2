@@ -25,15 +25,15 @@ module.exports = async (req, res) => {
     const page = await browser.newPage();
 
     const logoTag = logoBase64
-      ? `<img src="${logoBase64}" style="height:28px;max-width:110px;object-fit:contain;">`
+      ? `<img src="${logoBase64}" style="height:42px;max-width:150px;object-fit:contain;">`
       : `<span style="font-size:9pt;font-weight:700;">Orbit Digital</span>`;
 
-    const headerHtml = `<div style="width:100%;padding:2px 18mm 2px;display:flex;justify-content:space-between;align-items:center;font-family:sans-serif;font-size:7.5pt;border-bottom:0.5px solid #aaa;-webkit-print-color-adjust:exact;background:#fff;line-height:1.25;">
+    const headerHtml = `<div style="width:100%;padding:5px 20mm 4px;display:flex;justify-content:space-between;align-items:center;font-family:sans-serif;font-size:8pt;border-bottom:0.5px solid #aaa;-webkit-print-color-adjust:exact;background:#fff;">
       ${logoTag}
-      <div style="color:#555;text-align:right;">บริษัท ออร์บิท ดิจิทัล จำกัด</div>
+      <span style="color:#555;text-align:right;">บริษัท ออร์บิท ดิจิทัล จำกัด</span>
     </div>`;
 
-    const footerHtml = `<div style="width:100%;padding:2px 18mm 2px;text-align:center;font-family:sans-serif;font-size:7.5pt;font-weight:700;border-top:0.5px solid #aaa;-webkit-print-color-adjust:exact;background:#fff;line-height:1.25;">
+    const footerHtml = `<div style="width:100%;padding:4px 20mm 5px;text-align:center;font-family:sans-serif;font-size:8pt;font-weight:700;border-top:0.5px solid #aaa;-webkit-print-color-adjust:exact;background:#fff;line-height:1.45;">
       บริษัท ออร์บิท ดิจิทัล จำกัด<br>
       <span style="font-weight:400;color:#555;font-size:7pt">51 ถนนนราธิวาสราชนครินทร์ แขวงสีลม เขตบางรัก กรุงเทพมหานคร</span>
     </div>`;
@@ -65,7 +65,7 @@ module.exports = async (req, res) => {
       .mp-sig-name,.mp-sig-role,.mp-sig-date{text-align:center;font-size:10pt}
       .mp-sig-name{font-weight:700}
       .mp-sig-date{font-size:9pt;color:#666}
-      .mp-hdr{display:flex;justify-content:flex-end;align-items:flex-start;border-bottom:none;padding-bottom:0;margin-bottom:8px}
+      .mp-hdr{display:flex;justify-content:flex-end;align-items:flex-start;border-bottom:none;padding-bottom:0;margin-bottom:14px}
       .mp-logo{display:none}
       .mp-hdr-right{text-align:right;font-size:10pt;line-height:2}
       .num{text-decoration:underline;font-weight:700}
@@ -78,7 +78,7 @@ module.exports = async (req, res) => {
     const pdf = await page.pdf({
       format: 'A4',
       printBackground: true,
-      margin: { top: '20mm', right: '18mm', bottom: '15mm', left: '18mm' },
+      margin: { top: '32mm', right: '18mm', bottom: '30mm', left: '18mm' },
       displayHeaderFooter: true,
       headerTemplate: headerHtml,
       footerTemplate: footerHtml,
