@@ -35,14 +35,15 @@ module.exports = async (req, res) => {
 
     const footerHtml = `<div style="width:100%;padding:4px 20mm 5px;text-align:center;font-family:sans-serif;font-size:8pt;font-weight:700;border-top:0.5px solid #aaa;-webkit-print-color-adjust:exact;background:#fff;line-height:1.45;">
       บริษัท ออร์บิท ดิจิทัล จำกัด<br>
-      <span style="font-weight:400;color:#555;font-size:7.5pt">51 ถนนนราธิวาสราชนครินทร์ แขวงสีลม เขตบางรัก กรุงเทพมหานคร</span>
+      <span style="font-weight:400;color:#555;font-size:7pt">51 ถนนนราธิวาสราชนครินทร์ แขวงสีลม เขตบางรัก กรุงเทพมหานคร</span>
     </div>`;
 
     const fullHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8">
     <style>
       *{box-sizing:border-box;margin:0;padding:0}
       body{font-family:'TH Sarabun New',sans-serif;font-size:10pt;color:#000;line-height:1.75;padding:0 4px}
-      table{width:100%;border-collapse:collapse;margin:6px 0;font-size:10pt}
+      table{width:100%;border-collapse:collapse;margin:6px 0;font-size:10pt;page-break-inside:auto}
+      tr{page-break-inside:avoid;break-inside:avoid}
       th{background:#d0d0d0;font-weight:700;text-align:center;padding:4px 8px;border:1px solid #555}
       td{padding:3px 8px;border:1px solid #888;text-align:center}
       td.tdl{text-align:left}
