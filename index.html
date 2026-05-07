@@ -5,42 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PMO Memo Generator — Orbit Digital</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun+New:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   @media print {
-    @page {
-      size: A4;
-      margin: 30mm 18mm 28mm 18mm;
-      @top-left {
-        content: element(header-logo);
-      }
-      @bottom-center {
-        content: element(footer-content);
-        font-family: 'TH Sarabun New', Sarabun, serif;
-        font-size: 8pt;
-        font-weight: 700;
-        border-top: 0.5px solid #aaa;
-        width: 100%;
-        text-align: center;
-        padding-top: 4px;
-      }
-    }
-  }
-  #running-header {
-    position: running(header-logo);
-    display: none;
-  }
-  #running-footer {
-    position: running(footer-content);
-    display: none;
+  
   }
   @media print {
-    #running-header, #running-footer { display: block; }
-  }
+    #running-header, }
 </style>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Sarabun',sans-serif;background:#f5f5f3;color:#1a1a1a;padding:2rem 1rem}
+body{font-family:'Sarabun New','Sarabun',sans-serif;background:#f5f5f3;color:#1a1a1a;padding:2rem 1rem}
 .container{max-width:780px;margin:0 auto}
 h1{font-size:22px;font-weight:500;margin-bottom:4px}
 .subtitle{font-size:13px;color:#888;margin-bottom:1.5rem}
@@ -69,7 +46,7 @@ button.secondary:hover{background:#E6F1FB}
 .row-sl{display:grid;grid-template-columns:2.5fr 1.2fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center}
 .row-hw{display:grid;grid-template-columns:2.5fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center}
 .row-name{display:grid;grid-template-columns:auto 1fr auto;gap:8px;margin-bottom:6px;align-items:center}
-.row-dep{display:grid;grid-template-columns:1.5fr 1.2fr 1fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center}
+.row-dep{display:grid;grid-template-columns:1.5fr 1.2fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center}
 .row-hdr{display:grid;gap:8px;margin-bottom:4px}
 .row-hdr span{font-size:11px;color:#888}
 .ri{font-size:13px;padding:6px 8px}
@@ -104,10 +81,8 @@ button.secondary:hover{background:#E6F1FB}
   html,body{background:#fff!important}
   .preview-wrap{background:#fff!important;padding:0!important;box-shadow:none!important;border:none!important}
   .memo-page{box-shadow:none!important;border:none!important;margin:0!important;padding:0!important;max-width:100%!important}
-  .print-header{display:none!important}
-  .print-footer{display:none!important}
 }
-.memo-page{font-family:'TH Sarabun New','Sarabun',serif;font-size:10pt;color:#000;background:#fff;padding:20px 40px 24px;max-width:820px;margin:0 auto;line-height:1.75}
+.memo-page{font-family:'Sarabun New','TH Sarabun New','Sarabun',serif;font-size:10pt;color:#000;background:#fff;padding:20px 40px 60px;max-width:820px;margin:0 auto;line-height:1.75}
 .mp-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
 .mp-logo{max-height:64px;max-width:150px;object-fit:contain}
 .mp-hdr-right{text-align:right;font-size:10pt;line-height:2}
@@ -130,15 +105,15 @@ button.secondary:hover{background:#E6F1FB}
 .mp-closing p{text-indent:3em}
 /* Fix #3: no border on approval box */
 .mp-approval{display:grid;grid-template-columns:1fr 1fr;margin-top:12px;border:1px solid #555;page-break-inside:avoid;break-inside:avoid}
-.mp-appr-cell{padding:6px 12px}
+.mp-appr-cell{padding:6px 12px;display:flex;flex-direction:column}
 .mp-appr-cell:first-child{border-right:1px solid #555}
 .mp-appr-head{font-size:10pt;font-weight:700;margin-bottom:5px}
 .mp-appr-opt{font-size:10pt;margin:2px 0}
-.mp-sig-space{height:36px;border-bottom:1px solid #333;margin:10px 16px 4px}
+.mp-sig-space{height:36px;border-bottom:1px solid #333;margin:auto 16px 4px}
 .mp-sig-name{text-align:center;font-size:10pt;font-weight:700}
 .mp-sig-role{text-align:center;font-size:10pt;color:#333}
 .mp-sig-date{text-align:center;font-size:9pt;color:#666;margin-top:2px}
-.mp-footer{margin-top:14px;border-top:1px solid #888;padding-top:8px;text-align:center;font-size:10pt;font-weight:700;line-height:1.8;page-break-inside:avoid;break-inside:avoid}
+.mp-footer{margin-top:28px;border-top:1px solid #888;padding-top:8px;text-align:center;font-size:10pt;font-weight:700;line-height:1.8}
 .mp-footer-sub{font-weight:400;font-size:9.5pt;color:#444}
 .preview-wrap{background:transparent;padding:0;max-width:820px;margin:0 auto}
 
@@ -162,8 +137,8 @@ button.secondary:hover{background:#E6F1FB}
   <div class="tab-panel active" id="tab-sl">
     <div class="sec">ข้อมูลทั่วไป</div>
     <div class="grid">
-      <div class="card"><label>เลขที่หนังสือ</label><input type="text" id="sl-docno" placeholder="เช่น 2601030"></div>
-      <div class="card"><label>วันที่ *</label><input type="date" id="sl-date"></div>
+      <div class="card"><label>เลขที่ Memo *</label><input type="text" id="sl-docno" placeholder="เช่น 2601030"></div>
+      <div class="card"><label>ลงวันที่ *</label><input type="date" id="sl-date"></div>
       <div class="card"><label>ชื่อโปรเจกต์ *</label><input type="text" id="sl-project" placeholder="เช่น AOA-MP"></div>
       <div class="card full"><label>แก้ไขหัวข้อเรื่อง <span style="color:#bbb;font-weight:400">(optional)</span></label><input type="text" id="sl-subject-override" placeholder="เว้นว่างเพื่อใช้ข้อความอัตโนมัติ"></div>
       <div class="card"><label>เรียน *</label><input type="text" id="sl-to" value="ประธานเจ้าหน้าที่บริหาร"></div>
@@ -197,13 +172,6 @@ button.secondary:hover{background:#E6F1FB}
       <div class="card"><label>วันที่แปลงเรท USD→THB</label><input type="date" id="sl-ratedate"></div>
       <div class="card"><label>จำนวนเงินเป็นตัวอักษร</label><input type="text" id="sl-amttext" placeholder="เช่น สองแสนห้าหมื่นห้าพันบาทถ้วน"></div>
     </div>
-    <div class="sec">ผู้ลงนาม</div>
-    <div class="grid">
-      <div class="card"><label>ชื่อผู้จัดการโครงการ *</label><input type="text" id="sl-pm" placeholder="เช่น นาง พิรุณรุ้ง แซ่อุ้ย"></div>
-      <div class="card"><label>วันที่ลงนาม</label><input type="date" id="sl-signdate"></div>
-      <div class="card"><label>ชื่อผู้อนุมัติ</label><input type="text" id="sl-ceo" placeholder="เช่น นาย ปกรณ์ เจียมสกุลทิพย์"></div>
-      <div class="card"><label>ตำแหน่งผู้อนุมัติ</label><input type="text" id="sl-ceotitle" value="ประธานเจ้าหน้าที่บริหาร"></div>
-    </div>
     <!-- Fix #7: Account table fixed alignment -->
     <div class="sec">ตาราง Account <span style="font-weight:400;color:#aaa;font-size:11px">(optional)</span></div>
     <div class="card full" style="margin-bottom:12px">
@@ -222,9 +190,19 @@ button.secondary:hover{background:#E6F1FB}
       </div>
       <button class="add-btn" style="margin-top:8px" onclick="addAcctTableRow()">+ เพิ่ม Account</button>
     </div>
+    <div class="sec">Reviewer</div>
+    <div class="grid">
+      <div class="card"><label>ชื่อผู้จัดการโครงการ *</label><input type="text" id="sl-pm" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>วันที่ลงนาม *</label><input type="date" id="sl-signdate"></div>
+    </div>
+    <div class="sec">Approver</div>
+    <div class="grid">
+      <div class="card"><label>ชื่อผู้อนุมัติ *</label><input type="text" id="sl-ceo" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>ตำแหน่งผู้อนุมัติ *</label><input type="text" id="sl-ceotitle" value="ประธานเจ้าหน้าที่บริหาร"></div>
+      <div class="card"><label>วันที่ลงนาม *</label><input type="date" id="sl-ceo-signdate"></div>
+    </div>
     <div class="btn-row">
       <button class="secondary" onclick="go('sl',false)">Preview</button>
-      <button class="secondary" onclick="generateWord('sl')">📄 Download Word</button>
       <button class="primary" onclick="go('sl',true)">Download PDF →</button>
     </div>
   </div>
@@ -233,8 +211,8 @@ button.secondary:hover{background:#E6F1FB}
   <div class="tab-panel" id="tab-int">
     <div class="sec">ข้อมูลทั่วไป</div>
     <div class="grid">
-      <div class="card"><label>เลขที่หนังสือ</label><input type="text" id="int-docno" placeholder="เช่น 2601031"></div>
-      <div class="card"><label>วันที่ *</label><input type="date" id="int-date"></div>
+      <div class="card"><label>เลขที่ Memo *</label><input type="text" id="int-docno" placeholder="เช่น 2601031"></div>
+      <div class="card"><label>ลงวันที่ *</label><input type="date" id="int-date"></div>
       <div class="card"><label>ชื่อโปรเจกต์ / ทีม *</label><input type="text" id="int-project" placeholder="เช่น AOA-MP"></div>
       <div class="card full"><label>แก้ไขหัวข้อเรื่อง <span style="color:#bbb;font-weight:400">(optional)</span></label><input type="text" id="int-subject-override" placeholder="เว้นว่างเพื่อใช้ข้อความอัตโนมัติ"></div>
       <div class="card"><label>เรียน *</label><input type="text" id="int-to" value="Project director โครงการ"></div>
@@ -245,6 +223,7 @@ button.secondary:hover{background:#E6F1FB}
       <div class="card full">
         <label>วัตถุประสงค์</label>
         <select id="int-reason-select" onchange="toggleOtherReason('int')">
+          <option value="">-- เลือกวัตถุประสงค์ --</option>
           <option value="เพื่อเสริมสร้างกำลังใจในการปฏิบัติงาน และส่งเสริมการทำงานเป็นทีม">เพื่อเสริมสร้างกำลังใจในการปฏิบัติงาน และส่งเสริมการทำงานเป็นทีม</option>
           <option value="เพื่อเสริมสร้างความสัมพันธ์ในทีมและพัฒนาการทำงานร่วมกัน">เพื่อเสริมสร้างความสัมพันธ์ในทีมและพัฒนาการทำงานร่วมกัน</option>
           <option value="other">อื่นๆ (กรอกเอง)</option>
@@ -257,16 +236,19 @@ button.secondary:hover{background:#E6F1FB}
       <div id="int-names"><div class="row-name"><span class="name-num">1.</span><input type="text" class="int-name ri" placeholder="ชื่อ-นามสกุล ตำแหน่ง"><button class="rm-btn" onclick="rmRow(this);renum('int-names');calcINTTotal()">ลบ</button></div></div>
       <button class="add-btn" onclick="addNameRow('int-names','int-name')">+ เพิ่มรายชื่อ</button>
     </div>
-    <div class="sec">ผู้ลงนาม</div>
+    <div class="sec">Reviewer</div>
     <div class="grid">
-      <div class="card"><label>ชื่อผู้จัดการโครงการ *</label><input type="text" id="int-pm" placeholder="เช่น นาง พิรุณรุ้ง แซ่อุ้ย"></div>
-      <div class="card"><label>วันที่ลงนาม</label><input type="date" id="int-signdate"></div>
-      <div class="card"><label>ชื่อผู้อนุมัติ</label><input type="text" id="int-dir"></div>
-      <div class="card"><label>ตำแหน่งผู้อนุมัติ</label><input type="text" id="int-dirtitle" value="ผู้อำนวยการโครงการ"></div>
+      <div class="card"><label>ชื่อผู้จัดการโครงการ *</label><input type="text" id="int-pm" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>วันที่ลงนาม *</label><input type="date" id="int-signdate"></div>
+    </div>
+    <div class="sec">Approver</div>
+    <div class="grid">
+      <div class="card"><label>ชื่อผู้อนุมัติ *</label><input type="text" id="int-dir" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>ตำแหน่งผู้อนุมัติ *</label><input type="text" id="int-dirtitle" value="ผู้อำนวยการโครงการ"></div>
+      <div class="card"><label>วันที่ลงนาม *</label><input type="date" id="int-dir-signdate"></div>
     </div>
     <div class="btn-row">
       <button class="secondary" onclick="go('int',false)">Preview</button>
-      <button class="secondary" onclick="generateWord('int')">📄 Download Word</button>
       <button class="primary" onclick="go('int',true)">Download PDF →</button>
     </div>
   </div>
@@ -275,8 +257,8 @@ button.secondary:hover{background:#E6F1FB}
   <div class="tab-panel" id="tab-hw">
     <div class="sec">ข้อมูลทั่วไป</div>
     <div class="grid">
-      <div class="card"><label>เลขที่หนังสือ</label><input type="text" id="hw-docno"></div>
-      <div class="card"><label>วันที่ *</label><input type="date" id="hw-date"></div>
+      <div class="card"><label>เลขที่ Memo *</label><input type="text" id="hw-docno"></div>
+      <div class="card"><label>ลงวันที่ *</label><input type="date" id="hw-date"></div>
       <div class="card"><label>ชื่อโปรเจกต์ *</label><input type="text" id="hw-project" placeholder="เช่น AOA-MP"></div>
       <div class="card full"><label>แก้ไขหัวข้อเรื่อง <span style="color:#bbb;font-weight:400">(optional)</span></label><input type="text" id="hw-subject-override" placeholder="เว้นว่างเพื่อใช้ข้อความอัตโนมัติ"></div>
       <div class="card"><label>เรียน *</label><input type="text" id="hw-to" value="ประธานเจ้าหน้าที่บริหาร"></div>
@@ -301,16 +283,19 @@ button.secondary:hover{background:#E6F1FB}
       <div class="card"><label>จำนวนเงินเป็นตัวอักษร</label><input type="text" id="hw-amttext" placeholder="เช่น หนึ่งแสนห้าหมื่นแปดพันบาทถ้วน"></div>
       <div class="card"><label>ผู้รับผิดชอบดูแลอุปกรณ์</label><input type="text" id="hw-custodian" placeholder="เช่น นาย ปัณณ์ รัตน์วัฒนา"></div>
     </div>
-    <div class="sec">ผู้ลงนาม</div>
+    <div class="sec">Reviewer</div>
     <div class="grid">
-      <div class="card"><label>ชื่อผู้จัดการโครงการ *</label><input type="text" id="hw-pm"></div>
-      <div class="card"><label>วันที่ลงนาม</label><input type="date" id="hw-signdate"></div>
-      <div class="card"><label>ชื่อผู้อนุมัติ</label><input type="text" id="hw-ceo"></div>
-      <div class="card"><label>ตำแหน่งผู้อนุมัติ</label><input type="text" id="hw-ceotitle" value="ประธานเจ้าหน้าที่บริหาร"></div>
+      <div class="card"><label>ชื่อผู้จัดการโครงการ *</label><input type="text" id="hw-pm" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>วันที่ลงนาม *</label><input type="date" id="hw-signdate"></div>
+    </div>
+    <div class="sec">Approver</div>
+    <div class="grid">
+      <div class="card"><label>ชื่อผู้อนุมัติ *</label><input type="text" id="hw-ceo" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>ตำแหน่งผู้อนุมัติ *</label><input type="text" id="hw-ceotitle" value="ประธานเจ้าหน้าที่บริหาร"></div>
+      <div class="card"><label>วันที่ลงนาม *</label><input type="date" id="hw-ceo-signdate"></div>
     </div>
     <div class="btn-row">
       <button class="secondary" onclick="go('hw',false)">Preview</button>
-      <button class="secondary" onclick="generateWord('hw')">📄 Download Word</button>
       <button class="primary" onclick="go('hw',true)">Download PDF →</button>
     </div>
   </div>
@@ -319,8 +304,8 @@ button.secondary:hover{background:#E6F1FB}
   <div class="tab-panel" id="tab-ent">
     <div class="sec">ข้อมูลทั่วไป</div>
     <div class="grid">
-      <div class="card"><label>เลขที่หนังสือ</label><input type="text" id="ent-docno"></div>
-      <div class="card"><label>วันที่ *</label><input type="date" id="ent-date"></div>
+      <div class="card"><label>เลขที่ Memo *</label><input type="text" id="ent-docno"></div>
+      <div class="card"><label>ลงวันที่ *</label><input type="date" id="ent-date"></div>
       <div class="card"><label>ชื่อโปรเจกต์ *</label><input type="text" id="ent-project" placeholder="เช่น AOA-MP"></div>
       <div class="card"><label>เรียน *</label><input type="text" id="ent-to" value="ประธานเจ้าหน้าที่บริหาร"></div>
       <div class="card full"><label>แก้ไขหัวข้อเรื่อง <span style="color:#bbb;font-weight:400">(optional)</span></label><input type="text" id="ent-subject-override" placeholder="เว้นว่างเพื่อใช้ข้อความอัตโนมัติ"></div>
@@ -333,16 +318,19 @@ button.secondary:hover{background:#E6F1FB}
       <div class="card"><label>จำนวนเงินเป็นตัวอักษร</label><input type="text" id="ent-amttext" placeholder="เช่น ห้าหมื่นบาทถ้วน"></div>
     </div>
 
-    <div class="sec">ผู้ลงนาม</div>
+    <div class="sec">Reviewer</div>
     <div class="grid">
-      <div class="card"><label>ชื่อผู้จัดการโครงการ *</label><input type="text" id="ent-pm"></div>
-      <div class="card"><label>วันที่ลงนาม</label><input type="date" id="ent-signdate"></div>
-      <div class="card"><label>ชื่อผู้อนุมัติ</label><input type="text" id="ent-ceo"></div>
-      <div class="card"><label>ตำแหน่งผู้อนุมัติ</label><input type="text" id="ent-ceotitle" value="ประธานเจ้าหน้าที่บริหาร"></div>
+      <div class="card"><label>ชื่อผู้จัดการโครงการ *</label><input type="text" id="ent-pm" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>วันที่ลงนาม *</label><input type="date" id="ent-signdate"></div>
+    </div>
+    <div class="sec">Approver</div>
+    <div class="grid">
+      <div class="card"><label>ชื่อผู้อนุมัติ *</label><input type="text" id="ent-ceo" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>ตำแหน่งผู้อนุมัติ *</label><input type="text" id="ent-ceotitle" value="ประธานเจ้าหน้าที่บริหาร"></div>
+      <div class="card"><label>วันที่ลงนาม *</label><input type="date" id="ent-ceo-signdate"></div>
     </div>
     <div class="btn-row">
       <button class="secondary" onclick="go('ent',false)">Preview</button>
-      <button class="secondary" onclick="generateWord('ent')">📄 Download Word</button>
       <button class="primary" onclick="go('ent',true)">Download PDF →</button>
     </div>
   </div>
@@ -351,18 +339,19 @@ button.secondary:hover{background:#E6F1FB}
   <div class="tab-panel" id="tab-dep">
     <div class="sec">ข้อมูลทั่วไป</div>
     <div class="grid">
-      <div class="card"><label>เลขที่หนังสือ</label><input type="text" id="dep-docno"></div>
-      <div class="card"><label>วันที่ *</label><input type="date" id="dep-date"></div>
+      <div class="card"><label>เลขที่ Memo *</label><input type="text" id="dep-docno"></div>
+      <div class="card"><label>ลงวันที่ *</label><input type="date" id="dep-date"></div>
       <div class="card"><label>ชื่อโปรเจกต์ *</label><input type="text" id="dep-project" placeholder="เช่น AOA-MP"></div>
       <div class="card full"><label>แก้ไขหัวข้อเรื่อง <span style="color:#bbb;font-weight:400">(optional)</span></label><input type="text" id="dep-subject-override" placeholder="เว้นว่างเพื่อใช้ข้อความอัตโนมัติ"></div>
       <div class="card"><label>เรียน *</label><input type="text" id="dep-to" value="ผู้อำนวยการโครงการ"></div>
       <div class="card"><label>วันที่ Deploy (Start) *</label><input type="date" id="dep-start"></div>
       <div class="card"><label>วันที่ Deploy (End) *</label><input type="date" id="dep-end"></div>
       <div class="card"><label>สถานที่ Deploy *</label><input type="text" id="dep-location" placeholder="เช่น สำนักงานลูกค้า"></div>
-      <div class="card"><label>รูปแบบ</label><select id="dep-mode"><option>Onsite</option><option>Online</option><option>Online / Onsite</option></select></div>
+      <div class="card"><label>รูปแบบ</label><select id="dep-mode"><option value="">-- เลือกรูปแบบ --</option><option>Onsite</option><option>Online</option><option>Online / Onsite</option></select></div>
       <div class="card full">
         <label>เหตุผล</label>
         <select id="dep-reason-select" onchange="toggleOtherReason('dep')">
+          <option value="">-- เลือกเหตุผล --</option>
           <option value="เพื่อความละเอียดในการเบิกแยก Online / Onsite">เพื่อความละเอียดในการเบิกแยก Online / Onsite</option>
           <option value="เพื่อสนับสนุนการ Deployment ให้เป็นไปอย่างราบรื่นและมีประสิทธิภาพ">เพื่อสนับสนุนการ Deployment ให้เป็นไปอย่างราบรื่นและมีประสิทธิภาพ</option>
           <option value="other">อื่นๆ (กรอกเอง)</option>
@@ -370,19 +359,18 @@ button.secondary:hover{background:#E6F1FB}
         <div class="other-reason-wrap" id="dep-other-wrap"><textarea id="dep-reason-other" rows="2" placeholder="ระบุเหตุผล..."></textarea></div>
       </div>
     </div>
-    <div class="sec">รายชื่อพนักงานที่ Deploy *</div>
+    <div class="sec">รายชื่อพนักงานที่ Deploy <span style="font-weight:400;color:#aaa;font-size:11px">(optional)</span></div>
     <div class="card full" style="margin-bottom:12px">
       <div id="dep-names"><div class="row-name"><span class="name-num">1.</span><input type="text" class="dep-name ri" placeholder="ชื่อ-นามสกุล ตำแหน่ง"><button class="rm-btn" onclick="rmRow(this);renum('dep-names')">ลบ</button></div></div>
       <button class="add-btn" onclick="addNameRow('dep-names','dep-name')">+ เพิ่มชื่อ</button>
     </div>
     <div class="sec">รายการค่าใช้จ่าย *</div>
     <div class="card full" style="margin-bottom:12px">
-      <div class="row-hdr row-dep"><span>ประเภทค่าใช้จ่าย</span><span>ราคา/คน/วัน (THB)</span><span>วันที่</span><span>จำนวนคน</span><span>รวม (THB)</span><span></span></div>
+      <div class="row-hdr row-dep"><span>ประเภทค่าใช้จ่าย</span><span>ราคา/คน/วัน (THB)</span><span>จำนวนคน</span><span>รวม (THB)</span><span></span></div>
       <div id="dep-rows">
         <div class="row-dep">
           <input class="ri dep-type" type="text" placeholder="เช่น ค่าอาหารมื้อหลัก">
           <input class="ri dep-price" type="number" placeholder="150" min="0" oninput="calcDepRow(this);calcDEPTotal()">
-          <input class="ri dep-date" type="date">
           <input class="ri dep-qty" type="number" placeholder="5" min="1" oninput="calcDepRow(this);calcDEPTotal()">
           <input class="ri dep-amt" type="number" readonly style="background:#f5f5f3;color:#555">
           <button class="rm-btn" onclick="rmRow(this);calcDEPTotal()">ลบ</button>
@@ -395,32 +383,28 @@ button.secondary:hover{background:#E6F1FB}
       </div>
     </div>
     <div class="grid">
-      <div class="card"><label>จำนวนเงินเป็นตัวอักษร</label><input type="text" id="dep-amttext"></div>
+      <div class="card"><label>จำนวนเงินเป็นตัวอักษร</label><input type="text" id="dep-amttext" placeholder="ex: หนึ่งร้อยบาทถ้วน"></div>
       <div class="card"><label>วงเงินอำนาจอนุมัติ (บาท)</label><input type="text" id="dep-authlimit" value="500,000"></div>
     </div>
-    <div class="sec">ผู้ลงนาม</div>
+    <div class="sec">Reviewer</div>
     <div class="grid">
-      <div class="card"><label>ชื่อผู้จัดการโครงการ *</label><input type="text" id="dep-pm"></div>
-      <div class="card"><label>วันที่ลงนาม</label><input type="date" id="dep-signdate"></div>
-      <div class="card"><label>ชื่อผู้อนุมัติ</label><input type="text" id="dep-dir"></div>
-      <div class="card"><label>ตำแหน่งผู้อนุมัติ</label><input type="text" id="dep-dirtitle" value="ผู้อำนวยการโครงการ"></div>
+      <div class="card"><label>ชื่อผู้จัดการโครงการ *</label><input type="text" id="dep-pm" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>วันที่ลงนาม *</label><input type="date" id="dep-signdate"></div>
+    </div>
+    <div class="sec">Approver</div>
+    <div class="grid">
+      <div class="card"><label>ชื่อผู้อนุมัติ *</label><input type="text" id="dep-dir" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>ตำแหน่งผู้อนุมัติ *</label><input type="text" id="dep-dirtitle" value="ผู้อำนวยการโครงการ"></div>
+      <div class="card"><label>วันที่ลงนาม *</label><input type="date" id="dep-dir-signdate"></div>
     </div>
     <div class="btn-row">
       <button class="secondary" onclick="go('dep',false)">Preview</button>
-      <button class="secondary" onclick="generateWord('dep')">📄 Download Word</button>
       <button class="primary" onclick="go('dep',true)">Download PDF →</button>
     </div>
   </div>
 </div>
 
 <!-- PDF TEMPLATE -->
-<div id="running-header">
-  <img id="running-logo" src="Picture1.png" style="height:36px;object-fit:contain" alt="Orbit Digital" onerror="this.style.display='none'">
-</div>
-<div id="running-footer">
-  <strong>บริษัท ออร์บิท ดิจิทัล จำกัด</strong><br>
-  <span style="font-weight:400;font-size:7.5pt;color:#555">51 ถนนนราธิวาสราชนครินทร์ แขวงสีลม เขตบางรัก กรุงเทพมหานคร</span>
-</div>
 <div id="pdf-template">
 <div class="preview-wrap">
 <div class="memo-page">
@@ -428,7 +412,7 @@ button.secondary:hover{background:#E6F1FB}
     <!-- Fix #8: use Picture1.png -->
     <img id="pdf-logo" class="mp-logo" src="Picture1.png" alt="Orbit Digital" onerror="this.style.display='none'">
     <div class="mp-hdr-right">
-      <div>เลขที่ <span class="num" id="pdf-docno"></span></div>
+      <div>เลขที่ <span style="font-weight:700" id="pdf-docno"></span></div>
       <div>ลงวันที่<span id="pdf-date"></span></div>
     </div>
   </div>
@@ -456,8 +440,9 @@ button.secondary:hover{background:#E6F1FB}
 
 <script>
 // Init dates
-['sl-date','sl-ratedate','sl-signdate','int-date','int-actdate','int-signdate',
- 'hw-date','hw-signdate','ent-date','ent-actdate','ent-signdate','dep-date','dep-start','dep-end','dep-signdate']
+['sl-date','sl-ratedate','sl-signdate','sl-ceo-signdate','int-date','int-actdate','int-signdate','int-dir-signdate',
+ 'hw-date','hw-signdate','hw-ceo-signdate','ent-date','ent-actdate','ent-signdate','ent-ceo-signdate',
+ 'dep-date','dep-start','dep-end','dep-signdate','dep-dir-signdate']
   .forEach(id=>{const el=document.getElementById(id);if(el)el.valueAsDate=new Date();});
 
 rebuildAcctTable();
@@ -467,7 +452,7 @@ function switchTab(tab,btn){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('tab-'+tab).classList.add('active');
-  document.getElementById('pdf-template').style.display='none';
+  const _pt=document.getElementById('pdf-template');_pt.style.cssText='';_pt.style.display='none';
 }
 
 // Fix #1: toggle other reason
@@ -511,7 +496,7 @@ function addHwRow(){
 }
 function addDepRow(){
   const d=document.createElement('div');d.className='row-dep';
-  d.innerHTML=`<input class="ri dep-type" type="text" placeholder="เช่น ค่าอาหารมื้อหลัก"><input class="ri dep-price" type="number" placeholder="150" min="0" oninput="calcDepRow(this);calcDEPTotal()"><input class="ri dep-date" type="date"><input class="ri dep-qty" type="number" placeholder="5" min="1" oninput="calcDepRow(this);calcDEPTotal()"><input class="ri dep-amt" type="number" readonly style="background:#f5f5f3;color:#555"><button class="rm-btn" onclick="rmRow(this);calcDEPTotal()">ลบ</button>`;
+  d.innerHTML=`<input class="ri dep-type" type="text" placeholder="เช่น ค่าอาหารมื้อหลัก"><input class="ri dep-price" type="number" placeholder="150" min="0" oninput="calcDepRow(this);calcDEPTotal()"><input class="ri dep-qty" type="number" placeholder="5" min="1" oninput="calcDepRow(this);calcDEPTotal()"><input class="ri dep-amt" type="number" readonly style="background:#f5f5f3;color:#555"><button class="rm-btn" onclick="rmRow(this);calcDEPTotal()">ลบ</button>`;
   document.getElementById('dep-rows').appendChild(d);
 }
 
@@ -562,7 +547,8 @@ function calcSLTotal(){
 function calcINTTotal(){
   const perPax=parseFloat(document.getElementById('int-perpax')?.value)||0;
   const names=document.querySelectorAll('.int-name').length;
-  document.getElementById('int-total-val').textContent=(perPax*names).toLocaleString('th-TH')+' THB';
+  const el=document.getElementById('int-total-val');
+  if(el)el.textContent=(perPax*names).toLocaleString('th-TH')+' THB';
 }
 function calcHWTotal(){
   let total=0;
@@ -618,8 +604,10 @@ function setHdr(docno,date,to,subject){
   if(ph_docno)ph_docno.textContent=docno||'-';
   if(ph_date)ph_date.textContent=fmtDate(date);
 }
-function setApproval(pm,pmRole,pmDate,approver,approverRole,toTitle){
-  document.getElementById('pdf-approval').innerHTML=`
+function setApproval(pm,pmRole,pmDate,approver,approverRole,approverDate,toTitle){
+  const _el=document.getElementById('pdf-approval');
+  if(!_el)return;
+  _el.innerHTML=`
     <div class="mp-appr-cell">
       <div class="mp-appr-head">เรียน${toTitle} เพื่อโปรดพิจารณาอนุมัติดำเนินการ</div>
       <div class="mp-appr-opt">o เห็นชอบ, เพื่อโปรดพิจารณาอนุมัติ</div>
@@ -635,7 +623,7 @@ function setApproval(pm,pmRole,pmDate,approver,approverRole,toTitle){
       <div class="mp-sig-space"></div>
       <div class="mp-sig-name">( ${approver||'................................'} )</div>
       <div class="mp-sig-role">${approverRole}</div>
-      <div class="mp-sig-date">${pmDate}</div>
+      <div class="mp-sig-date">${approverDate||pmDate}</div>
     </div>`;
 }
 function clearOpt(){
@@ -660,7 +648,7 @@ const FILL={
     const subjectOverride=v('sl-subject-override');
     const autoSubject=`ขออนุมัติงบประมาณเพื่อการจัดซื้อโปรแกรมสำหรับการพัฒนาในโครงการ ${project} โดยชำระเงินผ่านบัตรเครดิตบริษัท Orbit Digital 0321`;
     setHdr(v('sl-docno'),v('sl-date'),v('sl-to'),subjectOverride||autoSubject);
-    document.getElementById('pdf-body').innerHTML=`<p style="text-indent:3em">เนื่องด้วยพนักงานโครงการ ${project} บริษัท ออร์บิท ดิจิทัล จำกัด มีความจำเป็นต้องใช้งานโปรแกรม${lics.map(l=>` ${l.name}`).join(' และ')} ${reason} จึงขออนุมัติงบประมาณเพื่อต่ออายุการใช้งานโปรแกรม ตามรายละเอียดดังต่อไปนี้</p><ol class="mp-list">${lics.map(l=>`<li>โปรแกรม ${l.name} License ราคา ${l.price.toLocaleString('th-TH')} บาท/เดือน (ช่วงเดือน${sM} - ${eM})</li>`).join('')}</ol>`;
+    document.getElementById('pdf-body').innerHTML=`<p style="text-indent:3em">เนื่องด้วยพนักงานโครงการ ${project} บริษัท ออร์บิท ดิจิทัล จำกัด มีความจำเป็นต้องใช้งานโปรแกรม${lics.length===1?` ${lics[0].name}`:lics.length===2?` ${lics[0].name} และ ${lics[1].name}`:` ${lics.slice(0,-1).map(l=>l.name).join(', ')} และ ${lics[lics.length-1].name}`} ${reason} จึงขออนุมัติงบประมาณเพื่อต่ออายุการใช้งานโปรแกรม ตามรายละเอียดดังต่อไปนี้</p>`;
     let total=0;
     const rows=lics.map((l,i)=>{const a=l.price*l.months*l.qty;total+=a;return`<tr><td>${i+1}</td><td class="tdl">${l.name}</td><td>${l.price.toLocaleString('th-TH')}</td><td>${l.months}</td><td>${l.qty}</td><td>${a.toLocaleString('th-TH')}</td></tr>`;}).join('');
     document.getElementById('pdf-table-wrap').innerHTML=`<table class="mp-table"><thead><tr><th>No</th><th>Item</th><th>Price/Month (THB)</th><th>Month</th><th>QTY (License)</th><th>Amount (THB)</th></tr></thead><tbody>${rows}</tbody><tfoot><tr class="tr-total"><td colspan="5" style="text-align:right;font-weight:700">Total Amount</td><td>${total.toLocaleString('th-TH')}</td></tr></tfoot></table>`;
@@ -677,8 +665,8 @@ const FILL={
       document.getElementById('pdf-acct-body').innerHTML=aRows.map((r,i)=>`<tr><td>${i+1}</td><td class="tdl">${r.email}</td>${aCols.map((_,ci)=>`<td>${r.vals[ci]||'-'}</td>`).join('')}</tr>`).join('');
     } else document.getElementById('pdf-acct-wrap').style.display='none';
     const seats=lics.reduce((s,l)=>s+l.qty,0),maxM=Math.max(...lics.map(l=>l.months));
-    document.getElementById('pdf-closing').textContent=`ในการนี้จึงขอให้ท่านโปรดพิจารณาอนุมัติงบประมาณสำหรับค่าใช้จ่ายดังกล่าว ซึ่งเป็นค่าใช้จ่ายซื้อ ${lics.map(l=>l.name).join(' และ ')} จำนวนรวมทั้งหมด ${seats} Seats ระยะเวลา ${maxM} เดือน รวมเป็นจำนวนเงินไม่เกิน ${total.toLocaleString('th-TH')} บาท ${v('sl-amttext')?'('+v('sl-amttext')+') ':''} อ้างอิงอำนาจอนุมัติจากคู่มืออำนาจอนุมัติ พ.ศ. 2566 ข้อ 3.2 การชำระเงิน (ที่มีการตั้งงบประมาณไว้) หมวดการชำระค่าบริการ ซึ่งให้อำนาจแก่${v('sl-to')}ในวงเงินไม่เกิน 2,000,000 บาท`;
-    setApproval(pm,'ผู้จัดการโครงการ',fmtShort(v('sl-signdate')),v('sl-ceo'),v('sl-ceotitle'),v('sl-to'));
+    document.getElementById('pdf-closing').textContent=`ในการนี้จึงขอให้ท่านโปรดพิจารณาอนุมัติงบประมาณสำหรับค่าใช้จ่ายดังกล่าว ซึ่งเป็นค่าใช้จ่ายซื้อ ${(lics.length===1?lics[0].name:lics.length===2?`${lics[0].name} และ ${lics[1].name}`:`${lics.slice(0,-1).map(l=>l.name).join(', ')} และ ${lics[lics.length-1].name}`)} จำนวนรวมทั้งหมด ${seats} Seats ระยะเวลา ${maxM} เดือน รวมเป็นจำนวนเงินไม่เกิน ${total.toLocaleString('th-TH')} บาท ${v('sl-amttext')?'('+v('sl-amttext')+') ':''} อ้างอิงอำนาจอนุมัติจากคู่มืออำนาจอนุมัติ พ.ศ. 2566 ข้อ 3.2 การชำระเงิน (ที่มีการตั้งงบประมาณไว้) หมวดการชำระค่าบริการ ซึ่งให้อำนาจแก่${v('sl-to')}ในวงเงินไม่เกิน 2,000,000 บาท`;
+    setApproval(pm,'ผู้จัดการโครงการ',fmtShort(v('sl-signdate')),v('sl-ceo'),v('sl-ceotitle'),fmtShort(v('sl-ceo-signdate')),v('sl-to'));
     return true;
   },
   int(){
@@ -693,7 +681,7 @@ const FILL={
     document.getElementById('pdf-body').innerHTML=`<p style="text-indent:3em">เนื่องด้วย ทีม ${project} บริษัท ออร์บิท ดิจิทัล จำกัด ได้วางแผนจัดทำกิจกรรมทีมประจำ${v('int-quarter')||'ไตรมาส'} ร่วมกันภายในแผนก${reason?'เพื่อ'+reason:''} โดยกำหนดงบประมาณค่าใช้จ่ายเพื่อทำกิจกรรมทีม ในวันที่ ${fmtDate(v('int-actdate'))} วงเงินไม่เกินท่านละ ${perPax.toLocaleString('th-TH')} บาท (${v('int-amttext')||perPax.toLocaleString('th-TH')+' บาทถ้วน'}) สำหรับรายชื่อผู้เข้าร่วมกิจกรรม จำนวนทั้งหมด ${names.length} คน ได้แก่</p>`;
     document.getElementById('pdf-table-wrap').innerHTML=`<table class="mp-table"><thead><tr><th style="width:8%">ลำดับ</th><th>รายชื่อผู้เข้าร่วมกิจกรรม</th></tr></thead><tbody>${names.map((n,i)=>`<tr><td>${i+1}</td><td class="tdl">${n}</td></tr>`).join('')}</tbody></table>`;
     document.getElementById('pdf-closing').textContent=`ในการนี้จึงขอให้ท่านโปรดพิจารณาอนุมัติงบประมาณสำหรับค่ากิจกรรมทีม ${project} เพื่อใช้จัดกิจกรรมดังกล่าว เป็นวงเงินจำนวนไม่เกิน ${total.toLocaleString('th-TH')} บาท${v('int-amttext')?' ('+v('int-amttext')+')':''}`;
-    setApproval(pm,'ผู้จัดการโครงการ',fmtShort(v('int-signdate')),v('int-dir'),v('int-dirtitle'),v('int-to'));
+    setApproval(pm,'ผู้จัดการโครงการ',fmtShort(v('int-signdate')),v('int-dir'),v('int-dirtitle'),fmtShort(v('int-dir-signdate')),v('int-to'));
     return true;
   },
   hw(){
@@ -709,7 +697,7 @@ const FILL={
     const rows=items.map((it,i)=>{const a=it.price*it.qty;total+=a;return`<tr><td>${i+1}</td><td class="tdl">${it.name}</td><td>${it.price.toLocaleString('th-TH')}</td><td>${it.qty}</td><td>${a.toLocaleString('th-TH')}</td></tr>`;}).join('');
     document.getElementById('pdf-table-wrap').innerHTML=`<table class="mp-table"><thead><tr><th>No</th><th>รายการ</th><th>ราคา/ชิ้น (THB)</th><th>จำนวน (ชิ้น)</th><th>Amount (THB)</th></tr></thead><tbody>${rows}</tbody><tfoot><tr class="tr-total"><td colspan="4" style="text-align:right;font-weight:700">Total Amount</td><td>${total.toLocaleString('th-TH')}</td></tr></tfoot></table>`;
     document.getElementById('pdf-closing').textContent=`ในการนี้จึงขอให้ท่านโปรดพิจารณาอนุมัติงบประมาณสำหรับค่าใช้จ่ายจัดซื้ออุปกรณ์ Hardware ดังกล่าว รวมเป็นจำนวนเงินไม่เกิน ${total.toLocaleString('th-TH')} บาท${v('hw-amttext')?' ('+v('hw-amttext')+')':''}${v('hw-custodian')?' โดยมอบหมายให้ '+v('hw-custodian')+' เป็นผู้รับผิดชอบดูแลอุปกรณ์':''} อ้างอิงอำนาจอนุมัติจากคู่มืออำนาจอนุมัติ พ.ศ. 2566 ข้อ 3.2 ซึ่งให้อำนาจแก่${v('hw-to')}ในวงเงินไม่เกิน 2,000,000 บาท`;
-    setApproval(pm,'ผู้จัดการโครงการ',fmtShort(v('hw-signdate')),v('hw-ceo'),v('hw-ceotitle'),v('hw-to'));
+    setApproval(pm,'ผู้จัดการโครงการ',fmtShort(v('hw-signdate')),v('hw-ceo'),v('hw-ceotitle'),fmtShort(v('hw-ceo-signdate')),v('hw-to'));
     return true;
   },
   ent(){
@@ -725,7 +713,7 @@ const FILL={
     document.getElementById('pdf-body').innerHTML=`<p style="text-indent:3em">สืบเนื่องจากพนักงานโครงการ ${project} บริษัท ออร์บิท ดิจิทัล จำกัด ได้วางแผนจัดงานบริษัทเลี้ยงรับรองลูกค้าเพื่อขอบคุณ ซึ่งจะจัดวันที่ ${entDateStr} สถานที่จัดคือ ${v('ent-location')||'-'} จำนวนผู้เข้าร่วมโดยประมาณ ${v('ent-pax')||'-'} คน โดยกำหนดงบประมาณสำหรับค่าใช้จ่ายงานเลี้ยงรับรองลูกค้าเป็นจำนวนเงินไม่เกิน ${budget.toLocaleString('th-TH')} บาท</p>`;
     document.getElementById('pdf-table-wrap').innerHTML='';
     document.getElementById('pdf-closing').textContent=`ในการนี้จึงขอให้ท่านโปรดพิจารณาอนุมัติงบประมาณค่ารับรองลูกค้าจาก${customer}ในช่วงเวลาดังกล่าว อ้างอิงอำนาจอนุมัติจากคู่มืออำนาจอนุมัติ พ.ศ. 2564 ข้อ 3.2 การชำระเงิน (ที่มีการตั้งงบประมาณไว้) หมวดค่าเลี้ยงรับรอง วงเงินไม่เกิน 150,000 บาท ซึ่งให้อำนาจแก่${v('ent-to')}ในการอนุมัติการชำระเงินในวงเงินไม่เกิน 150,000 บาท${v('ent-amttext')?' ('+v('ent-amttext')+')':''}`;
-    setApproval(pm,'ผู้จัดการโครงการ',fmtShort(v('ent-signdate')),v('ent-ceo'),v('ent-ceotitle'),v('ent-to'));
+    setApproval(pm,'ผู้จัดการโครงการ',fmtShort(v('ent-signdate')),v('ent-ceo'),v('ent-ceotitle'),fmtShort(v('ent-ceo-signdate')),v('ent-to'));
     return true;
   },
   dep(){
@@ -734,10 +722,9 @@ const FILL={
     const expenses=Array.from(document.querySelectorAll('#dep-rows .row-dep')).map(r=>({
       type:r.querySelector('.dep-type').value,
       price:parseFloat(r.querySelector('.dep-price').value)||0,
-      date:r.querySelector('.dep-date').value,
       qty:parseInt(r.querySelector('.dep-qty').value)||0
     })).filter(r=>r.price>0);
-    if(!project||!pm||!names.length){alert('กรุณากรอกชื่อโปรเจกต์, ผู้จัดการโครงการ และรายชื่อพนักงาน');return false;}
+    if(!project||!pm){alert('กรุณากรอกชื่อโปรเจกต์ และผู้จัดการโครงการ');return false;}
     clearOpt();
     const sDate=fmtDate(v('dep-start')),eDate=fmtDate(v('dep-end'));
     const reason=getReason('dep');
@@ -745,11 +732,11 @@ const FILL={
     setHdr(v('dep-docno'),v('dep-date'),v('dep-to'),depSubject);
     document.getElementById('pdf-body').innerHTML=`<p style="text-indent:3em">เนื่องด้วย พนักงานโครงการ ${project} บริษัท ออร์บิท ดิจิทัล จำกัด วางแผนดำเนินการ Deployment ที่ ${v('dep-location')||'-'} ใน ${sDate}${eDate&&eDate!==sDate?' – '+eDate:''} จึงขออนุมัติงบประมาณค่าใช้จ่ายสำหรับพนักงานที่อยู่ปฏิบัติงานล่วงเวลาจำนวน ${names.length} คน (${v('dep-mode')}) ${reason} โดยมีรายละเอียดดังต่อไปนี้</p>`;
     let total=0;
-    const expRows=expenses.map((e,i)=>{const a=e.price*e.qty;total+=a;return`<tr><td>${i+1}</td><td class="tdl">${e.type}</td><td>${fmtDate(e.date)||'-'}</td><td>${e.price.toLocaleString('th-TH')}</td><td>${e.qty}</td><td>${a.toLocaleString('th-TH')}</td></tr>`;}).join('');
+    const expRows=expenses.map((e,i)=>{const a=e.price*e.qty;total+=a;return`<tr><td>${i+1}</td><td class="tdl">${e.type}</td><td>${e.price.toLocaleString('th-TH')}</td><td>${e.qty}</td><td>${a.toLocaleString('th-TH')}</td></tr>`;}).join('');
     const nameRows=names.map((n,i)=>`<tr><td>${i+1}</td><td class="tdl">${n}</td></tr>`).join('');
-    document.getElementById('pdf-table-wrap').innerHTML=`<table class="mp-table"><thead><tr><th>No</th><th>ประเภทค่าใช้จ่าย</th><th>วันที่</th><th>ราคา/คน (THB)</th><th>จำนวนคน</th><th>รวม (THB)</th></tr></thead><tbody>${expRows}</tbody><tfoot><tr class="tr-total"><td colspan="5" style="text-align:right;font-weight:700">ยอดรวมทั้งหมด</td><td>${total.toLocaleString('th-TH')}</td></tr></tfoot></table><br><table class="mp-table"><thead><tr><th style="width:8%">ลำดับ</th><th>รายชื่อพนักงาน</th></tr></thead><tbody>${nameRows}</tbody></table>`;
+    document.getElementById('pdf-table-wrap').innerHTML=`<table class="mp-table"><thead><tr><th>No</th><th>ประเภทค่าใช้จ่าย</th><th>ราคา/คน (THB)</th><th>จำนวนคน</th><th>รวม (THB)</th></tr></thead><tbody>${expRows}</tbody><tfoot><tr class="tr-total"><td colspan="4" style="text-align:right;font-weight:700">ยอดรวมทั้งหมด</td><td>${total.toLocaleString('th-TH')}</td></tr></tfoot></table><br><table class="mp-table"><thead><tr><th style="width:8%">ลำดับ</th><th>รายชื่อพนักงาน</th></tr></thead><tbody>${nameRows}</tbody></table>`;
     document.getElementById('pdf-closing').textContent=`จึงขอความอนุเคราะห์อนุมัติการจัดซื้อสำหรับรายการข้างต้น ในวงเงิน ${total.toLocaleString('th-TH')} บาท${v('dep-amttext')?' ('+v('dep-amttext')+')':''} อ้างอิงอำนาจอนุมัติจากคู่มืออำนาจอนุมัติ พ.ศ. 2566 ข้อ 3.2 การชำระเงิน (ที่มีการตั้งงบประมาณไว้) หมวดการชำระค่าสวัสดิการพนักงาน ซึ่งให้อำนาจผู้อำนวยการในการอนุมัติการชำระเงินในวงเงินไม่เกิน ${v('dep-authlimit')||'500,000'} บาท`;
-    setApproval(pm,'ผู้จัดการโครงการ',fmtShort(v('dep-signdate')),v('dep-dir'),v('dep-dirtitle'),v('dep-to'));
+    setApproval(pm,'ผู้จัดการโครงการ',fmtShort(v('dep-signdate')),v('dep-dir'),v('dep-dirtitle'),fmtShort(v('dep-dir-signdate')),v('dep-to'));
     return true;
   }
 };
@@ -779,7 +766,7 @@ function generateWord(tab){
     .mp-note{font-size:9pt;margin:4px 0 12px}
     .mp-closing p{text-indent:3em}
     .mp-footer{margin-top:14px;border-top:1px solid #888;padding-top:8px;text-align:center;font-weight:700}
-    .print-header,.print-footer{display:none}
+    .print-header,
   </style>
   </head><body>${page}</body></html>`;
   const blob=new Blob(['﻿'+html],{type:'application/msword'});
@@ -796,64 +783,224 @@ function generateWord(tab){
   URL.revokeObjectURL(url);
 }
 
+
+// ===== pdfmake PDF Generator =====
+async function generatePDFMake(tab, filename){
+  // Get logo as base64
+  let logoDataUrl = null;
+  try{
+    const logoImg = document.getElementById('pdf-logo');
+    if(logoImg && logoImg.complete && logoImg.naturalWidth > 0){
+      const canvas = document.createElement('canvas');
+      canvas.width = logoImg.naturalWidth;
+      canvas.height = logoImg.naturalHeight;
+      canvas.getContext('2d').drawImage(logoImg, 0, 0);
+      logoDataUrl = canvas.toDataURL('image/png');
+    }
+  }catch(e){ console.warn('Logo error:', e); }
+
+  // Get memo data from current state
+  const docno = document.getElementById('pdf-docno').textContent || '-';
+  const date = document.getElementById('pdf-date').textContent || '';
+  const subject = document.getElementById('pdf-subject').textContent || '';
+  const to = document.getElementById('pdf-to').textContent || '';
+  const bodyEl = document.getElementById('pdf-body');
+  const closingEl = document.getElementById('pdf-closing');
+  const noteEl = document.getElementById('pdf-note');
+
+  // Parse table from pdf-table-wrap
+  const tableWrap = document.getElementById('pdf-table-wrap');
+  const tables = [];
+  tableWrap.querySelectorAll('table').forEach(tbl => {
+    const headers = Array.from(tbl.querySelectorAll('thead th')).map(th => ({text: th.textContent, bold:true, fillColor:'#d0d0d0', alignment:'center'}));
+    const bodyRows = Array.from(tbl.querySelectorAll('tbody tr')).map(tr =>
+      Array.from(tr.querySelectorAll('td')).map(td => ({text: td.textContent, alignment: td.classList.contains('tdl')?'left':'center'}))
+    );
+    const footRows = Array.from(tbl.querySelectorAll('tfoot tr')).map(tr =>
+      Array.from(tr.querySelectorAll('td')).map((td, i, arr) => ({
+        text: td.textContent,
+        bold: true,
+        fillColor: '#ebebeb',
+        alignment: i === arr.length-1 ? 'center' : 'right',
+        colSpan: td.colSpan || 1
+      }))
+    );
+    if(headers.length) tables.push({headers, bodyRows, footRows, colCount: headers.length});
+  });
+
+  // Parse approval box
+  const approvalEl = document.getElementById('pdf-approval');
+  const cells = approvalEl ? Array.from(approvalEl.querySelectorAll('.mp-appr-cell')) : [];
+
+  // Parse account table
+  const acctWrap = document.getElementById('pdf-acct-wrap');
+  const acctVisible = acctWrap && acctWrap.style.display !== 'none';
+
+  // Build body content
+  const docBody = [];
+
+  // Header row (logo + docno/date)
+  const headerRow = {
+    columns: [
+      logoDataUrl ? {image: logoDataUrl, width: 80, height: 32} : {text: 'Orbit Digital', bold: true, fontSize: 12},
+      {
+        text: [
+          {text: 'เลขที่ ', fontSize: 10},
+          {text: docno, bold: true, fontSize: 10},
+          '
+',
+          {text: 'ลงวันที่' + date, fontSize: 10}
+        ],
+        alignment: 'right'
+      }
+    ],
+    margin: [0, 0, 0, 10]
+  };
+  docBody.push(headerRow);
+  docBody.push({canvas:[{type:'line',x1:0,y1:0,x2:515,y2:0,lineWidth:1}], margin:[0,0,0,12]});
+
+  // Title
+  docBody.push({text: 'บันทึกข้อความ', style: 'title', alignment: 'center', margin:[0,0,0,14]});
+
+  // เรื่อง/เรียน
+  docBody.push({columns:[{text:'เรื่อง', bold:true, width:60},{text: subject}], margin:[0,0,0,4]});
+  docBody.push({columns:[{text:'เรียน', bold:true, width:60},{text: to}], margin:[0,0,0,12]});
+
+  // Body text
+  const bodyText = bodyEl ? bodyEl.innerText.trim() : '';
+  if(bodyText) docBody.push({text: bodyText, margin:[0,0,0,8], lineHeight: 1.5});
+
+  // Tables
+  tables.forEach(t => {
+    const tableBody = [];
+    if(t.headers.length) tableBody.push(t.headers);
+    t.bodyRows.forEach(r => tableBody.push(r));
+    // Handle foot rows with colSpan
+    t.footRows.forEach(row => {
+      const fixedRow = [];
+      row.forEach(cell => {
+        fixedRow.push(cell);
+        for(let i = 1; i < (cell.colSpan||1); i++) fixedRow.push({text:'',border:[false,false,false,false]});
+      });
+      tableBody.push(fixedRow);
+    });
+    docBody.push({
+      table: {headerRows:1, widths: Array(t.colCount).fill('*'), body: tableBody},
+      margin:[0,6,0,6],
+      fontSize: 9
+    });
+  });
+
+  // Note
+  if(noteEl && noteEl.style.display !== 'none'){
+    docBody.push({text: noteEl.innerText.trim(), fontSize: 8, color:'#555', margin:[0,4,0,10], alignment:'center'});
+  }
+
+  // Account table
+  if(acctVisible){
+    const acctTables = acctWrap.querySelectorAll('table');
+    acctTables.forEach(tbl => {
+      const hdrs = Array.from(tbl.querySelectorAll('thead th')).map(th=>({text:th.textContent,bold:true,fillColor:'#d0d0d0',alignment:'center'}));
+      const rows = Array.from(tbl.querySelectorAll('tbody tr')).map(tr=>Array.from(tr.querySelectorAll('td')).map(td=>({text:td.textContent,alignment:td.classList.contains('tdl')?'left':'center'})));
+      if(hdrs.length) docBody.push({table:{headerRows:1,widths:Array(hdrs.length).fill('*'),body:[hdrs,...rows]},margin:[0,4,0,8],fontSize:9});
+    });
+  }
+
+  // Closing
+  const closingText = closingEl ? closingEl.innerText.trim() : '';
+  if(closingText) docBody.push({text: closingText, margin:[0,8,0,12], lineHeight:1.5, fontSize:9.5});
+
+  // Approval box
+  if(cells.length === 2){
+    const leftLines = cells[0].innerText.trim().split('
+').filter(l=>l.trim());
+    const rightLines = cells[1].innerText.trim().split('
+').filter(l=>l.trim());
+    docBody.push({
+      table:{
+        widths:['50%','50%'],
+        body:[[
+          {
+            stack: [
+              ...leftLines.slice(0,4).map(l=>({text:l, fontSize:9})),
+              {text:' ', margin:[0,20,0,0]},
+              {canvas:[{type:'line',x1:20,y1:0,x2:215,y2:0,lineWidth:0.5}]},
+              ...leftLines.slice(4).map(l=>({text:l, fontSize:9, alignment:'center', bold: l.includes('(')}))
+            ],
+            margin:[8,8,8,8]
+          },
+          {
+            stack: [
+              ...rightLines.slice(0,2).map(l=>({text:l, fontSize:9})),
+              {text:' ', margin:[0,20,0,0]},
+              {canvas:[{type:'line',x1:20,y1:0,x2:215,y2:0,lineWidth:0.5}]},
+              ...rightLines.slice(2).map(l=>({text:l, fontSize:9, alignment:'center', bold: l.includes('(')}))
+            ],
+            margin:[8,8,8,8]
+          }
+        ]]
+      },
+      margin:[0,0,0,0],
+      pageBreak: 'avoid'
+    });
+  }
+
+  // Build docDefinition
+  const docDefinition = {
+    pageSize: 'A4',
+    pageMargins: [57, 85, 57, 70],
+    defaultStyle: { font: 'Roboto', fontSize: 10, lineHeight: 1.4 },
+    styles: { title: { fontSize: 16, bold: true, characterSpacing: 1 } },
+    header: (currentPage, pageCount) => ({
+      columns: [
+        logoDataUrl ? {image: logoDataUrl, width:60, height:24, margin:[57,10,0,0]} : {text:'', margin:[57,10,0,0]},
+        {text:'บริษัท ออร์บิท ดิจิทัล จำกัด', alignment:'right', fontSize:8, color:'#555', margin:[0,14,57,0]}
+      ],
+      margin:[0,0,0,0]
+    }),
+    footer: (currentPage, pageCount) => ({
+      stack:[
+        {canvas:[{type:'line',x1:57,y1:0,x2:538,y2:0,lineWidth:0.5,lineColor:'#888'}]},
+        {text:'บริษัท ออร์บิท ดิจิทัล จำกัด', alignment:'center', bold:true, fontSize:9, margin:[0,4,0,0]},
+        {text:'51 ถนนนราธิวาสราชนครินทร์ แขวงสีลม เขตบางรัก กรุงเทพมหานคร', alignment:'center', fontSize:8, color:'#555'}
+      ],
+      margin:[0,4,0,0]
+    }),
+    content: docBody
+  };
+
+  pdfMake.createPdf(docDefinition).download(filename);
+}
+
 const TAB_PREFIX={sl:'SL',int:'INT',hw:'HW',ent:'ENT',dep:'DEP'};
 const TAB_DATE={sl:'sl-date',int:'int-date',hw:'hw-date',ent:'ent-date',dep:'dep-date'};
 const TAB_DOCNO={sl:'sl-docno',int:'int-docno',hw:'hw-docno',ent:'ent-docno',dep:'dep-docno'};
 
-async function go(tab,print){
+async function go(tab,doPrint){
   if(!FILL[tab]())return;
   const t=document.getElementById('pdf-template');
-  t.style.display='block';
-  if(print){
+  t.style.cssText='';t.style.display='block';
+  if(doPrint){
     const type=TAB_PREFIX[tab];
     const docno=v(TAB_DOCNO[tab]);
     const date=v(TAB_DATE[tab]);
     const filename=getFileName(type,docno,date);
-    // Get memo content HTML
-    const memoPage=document.querySelector('.memo-page');
-    if(!memoPage){return;}
-    // Convert logo to base64
-    let logoBase64='';
-    try{
-      const logoImg=document.getElementById('pdf-logo');
-      if(logoImg&&logoImg.src&&!logoImg.src.startsWith('data:')){
-        const resp=await fetch(logoImg.src);
-        const blob=await resp.blob();
-        logoBase64=await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(blob);});
-      } else if(logoImg&&logoImg.src.startsWith('data:')){
-        logoBase64=logoImg.src;
-      }
-    }catch(e){console.warn('Logo fetch failed',e);}
-    // Show loading
     const btn=event?.target;
     const origText=btn?.textContent||'';
-    if(btn)btn.textContent='กำลัง Generate...';
+    if(btn){btn.textContent='⏳ กำลัง Generate...';btn.disabled=true;}
     try{
-      const res=await fetch('/api/generate-pdf',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          html:memoPage.innerHTML,
-          filename:filename,
-          logoBase64:logoBase64
-        })
-      });
-      if(!res.ok){throw new Error('API error '+res.status);}
-      const blob=await res.blob();
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a');
-      a.href=url;a.download=filename;a.click();
-      URL.revokeObjectURL(url);
+      await generatePDFMake(tab, filename);
     }catch(err){
-      console.error(err);
-      alert('ไม่สามารถ generate PDF ได้ กำลังใช้ browser print แทนค่ะ');
+      console.error('pdfmake error:',err);
       document.title=filename.replace('.pdf','');
       setTimeout(()=>{window.print();setTimeout(()=>{document.title='PMO Memo Generator — Orbit Digital';},1000);},350);
     }finally{
-      if(btn)btn.textContent=origText;
+      if(btn){btn.textContent=origText;btn.disabled=false;}
     }
   } else {
-    t.scrollIntoView({behavior:'smooth'});
+    requestAnimationFrame(()=>{
+      t.scrollIntoView({behavior:'smooth',block:'start'});
+    });
   }
 }
 </script>
