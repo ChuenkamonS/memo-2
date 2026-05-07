@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PMO Memo Generator — Orbit Digital</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script></script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun+New:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   @media print {
@@ -847,8 +847,7 @@ async function generatePDFMake(tab, filename){
         text: [
           {text: 'เลขที่ ', fontSize: 10},
           {text: docno, bold: true, fontSize: 10},
-          '
-',
+          '\n',
           {text: 'ลงวันที่' + date, fontSize: 10}
         ],
         alignment: 'right'
@@ -912,10 +911,8 @@ async function generatePDFMake(tab, filename){
 
   // Approval box
   if(cells.length === 2){
-    const leftLines = cells[0].innerText.trim().split('
-').filter(l=>l.trim());
-    const rightLines = cells[1].innerText.trim().split('
-').filter(l=>l.trim());
+    const leftLines = cells[0].innerText.trim().split('\n').filter(l=>l.trim());
+    const rightLines = cells[1].innerText.trim().split('\n').filter(l=>l.trim());
     docBody.push({
       table:{
         widths:['50%','50%'],
