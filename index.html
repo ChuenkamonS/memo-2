@@ -1009,9 +1009,27 @@ async function go(tab,doPrint){
     const origText=btn?.textContent||'';
     if(btn){btn.textContent='⏳ กำลัง Generate...';btn.disabled=true;}
     try{
-      await generatePDFMake(tab, filename);
+      // Get rendered HTML from memo-page
+      const t2=document.getElementById('pdf-template');
+      t2.style.cssText='display:block;position:absolute;left:-9999px;top:0;width:820px';
+      await new Promise(r=>setTimeout(r,150));
+      const html=document.querySelector('.memo-page')?.innerHTML||'';
+      t2.style.cssText='';t2.style.display='none';
+
+      const resp=await fetch('https://memo-pdf-server.onrender.com/generate-pdf',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({html, filename})
+      });
+      if(!resp.ok) throw new Error('Server error '+resp.status);
+      const blob=await resp.blob();
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url;a.download=filename;a.click();
+      URL.revokeObjectURL(url);
     }catch(err){
-      console.error('pdfmake error:',err);
+      console.error('PDF error:',err);
+      alert('ไม่สามารถ generate PDF ได้\nกำลังใช้ browser print แทนค่ะ');
       document.title=filename.replace('.pdf','');
       setTimeout(()=>{window.print();setTimeout(()=>{document.title='PMO Memo Generator — Orbit Digital';},1000);},350);
     }finally{
