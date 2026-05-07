@@ -785,44 +785,38 @@ function generateWord(tab){
 
 
 // ===== pdfmake PDF Generator =====
-// Cache for font data
 let _sarabunFont = null;
+let _sarabunBoldFont = null;
 
 async function loadSarabunFont(){
   if(_sarabunFont) return _sarabunFont;
   try {
-    // Load from local GitHub repo files
     const resp = await fetch('THSarabun.ttf');
     if(resp.ok){
       const buf = await resp.arrayBuffer();
-      const b64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
-      _sarabunFont = b64;
-      return b64;
+      _sarabunFont = btoa(String.fromCharCode(...new Uint8Array(buf)));
+      return _sarabunFont;
     }
   } catch(e) { console.warn('Font load failed:', e); }
   return null;
 }
 
-let _sarabunBoldFont = null;
 async function loadSarabunBoldFont(){
   if(_sarabunBoldFont) return _sarabunBoldFont;
   try {
     const resp = await fetch('THSarabun Bold.ttf');
     if(resp.ok){
       const buf = await resp.arrayBuffer();
-      const b64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
-      _sarabunBoldFont = b64;
-      return b64;
+      _sarabunBoldFont = btoa(String.fromCharCode(...new Uint8Array(buf)));
+      return _sarabunBoldFont;
     }
   } catch(e) { console.warn('Bold font load failed:', e); }
   return null;
 }
 
 async function generatePDFMake(tab, filename){
-  // Load Thai fonts
   const [fontB64, boldB64] = await Promise.all([loadSarabunFont(), loadSarabunBoldFont()]);
 
-  // Set up fonts
   if(fontB64){
     pdfMake.vfs['THSarabun.ttf'] = fontB64;
     pdfMake.vfs['THSarabunBold.ttf'] = boldB64 || fontB64;
@@ -835,149 +829,158 @@ async function generatePDFMake(tab, filename){
       }
     };
   }
+  const F = fontB64 ? 'THSarabun' : 'Roboto';
 
-  const useFont = fontB64 ? 'THSarabun' : 'Roboto';
-
-  // Get logo as base64
+  // Get logo
   let logoDataUrl = null;
   try{
     const logoImg = document.getElementById('pdf-logo');
     if(logoImg && logoImg.complete && logoImg.naturalWidth > 0){
-      const canvas = document.createElement('canvas');
-      canvas.width = logoImg.naturalWidth;
-      canvas.height = logoImg.naturalHeight;
-      canvas.getContext('2d').drawImage(logoImg, 0, 0);
-      logoDataUrl = canvas.toDataURL('image/png');
+      const c = document.createElement('canvas');
+      c.width = logoImg.naturalWidth; c.height = logoImg.naturalHeight;
+      c.getContext('2d').drawImage(logoImg,0,0);
+      logoDataUrl = c.toDataURL('image/png');
     }
-  }catch(e){ console.warn('Logo error:', e); }
+  }catch(e){}
 
-  const docno = document.getElementById('pdf-docno').textContent || '-';
-  const date = document.getElementById('pdf-date').textContent || '';
-  const subject = document.getElementById('pdf-subject').textContent || '';
-  const to = document.getElementById('pdf-to').textContent || '';
-  const bodyEl = document.getElementById('pdf-body');
+  // Read data from already-rendered pdf-template
+  const docno = document.getElementById('pdf-docno').textContent||'-';
+  const date  = document.getElementById('pdf-date').textContent||'';
+  const subj  = document.getElementById('pdf-subject').textContent||'';
+  const to    = document.getElementById('pdf-to').textContent||'';
+  const bodyEl    = document.getElementById('pdf-body');
   const closingEl = document.getElementById('pdf-closing');
-  const noteEl = document.getElementById('pdf-note');
+  const noteEl    = document.getElementById('pdf-note');
 
-  // Parse tables
-  const tableWrap = document.getElementById('pdf-table-wrap');
-  const tables = [];
-  tableWrap.querySelectorAll('table').forEach(tbl => {
-    const headers = Array.from(tbl.querySelectorAll('thead th')).map(th => ({text: th.textContent.trim(), bold:true, fillColor:'#d0d0d0', alignment:'center', fontSize:9}));
-    const bodyRows = Array.from(tbl.querySelectorAll('tbody tr')).map(tr =>
-      Array.from(tr.querySelectorAll('td')).map(td => ({text: td.textContent.trim(), alignment: td.classList.contains('tdl')?'left':'center', fontSize:9}))
+  // Helper: build pdfmake table from HTML table element
+  function htmlTableToPdf(tbl){
+    const hdrs = Array.from(tbl.querySelectorAll('thead th')).map(th=>({
+      text:th.textContent.trim(), bold:true, fillColor:'#d0d0d0', alignment:'center', fontSize:9
+    }));
+    const bodyRows = Array.from(tbl.querySelectorAll('tbody tr')).map(tr=>
+      Array.from(tr.querySelectorAll('td')).map(td=>({
+        text:td.textContent.trim(),
+        alignment:td.classList.contains('tdl')?'left':'center', fontSize:9
+      }))
     );
-    const footRows = Array.from(tbl.querySelectorAll('tfoot tr')).map(tr => {
+    const footRows = Array.from(tbl.querySelectorAll('tfoot tr')).map(tr=>{
       const cells = Array.from(tr.querySelectorAll('td'));
       const row = [];
-      cells.forEach((td, i) => {
+      cells.forEach((td,i)=>{
         const cs = parseInt(td.getAttribute('colspan'))||1;
-        row.push({text: td.textContent.trim(), bold:true, fillColor:'#ebebeb', alignment: i===cells.length-1?'center':'right', fontSize:9, colSpan:cs});
+        row.push({text:td.textContent.trim(), bold:true, fillColor:'#ebebeb',
+          alignment:i===cells.length-1?'center':'right', fontSize:9, colSpan:cs});
         for(let j=1;j<cs;j++) row.push({});
       });
       return row;
     });
-    if(headers.length) tables.push({headers, bodyRows, footRows, colCount:headers.length});
-  });
-
-  // Parse approval
-  const approvalEl = document.getElementById('pdf-approval');
-  const cells = approvalEl ? Array.from(approvalEl.querySelectorAll('.mp-appr-cell')) : [];
-
-  // Parse account table
-  const acctWrap = document.getElementById('pdf-acct-wrap');
-  const acctVisible = acctWrap && acctWrap.style.display !== 'none';
+    if(!hdrs.length) return null;
+    return {table:{headerRows:1, widths:Array(hdrs.length).fill('*'),
+      body:[hdrs,...bodyRows,...footRows]}, margin:[0,4,0,6]};
+  }
 
   const docBody = [];
 
-  // Header
-  const hdrContent = {
-    columns: [
-      logoDataUrl ? {image:logoDataUrl, width:70, height:28, margin:[0,0,0,0]} : {text:''},
-      {text:[{text:'เลขที่ ', fontSize:10},{text:docno, bold:true, fontSize:10},{text:'\nลงวันที่'+date, fontSize:10}], alignment:'right'}
+  // 1. Header (logo + docno/date) — NO logo here since pdfmake header already has it
+  docBody.push({
+    columns:[
+      logoDataUrl?{image:logoDataUrl,width:75,height:30}:{text:''},
+      {stack:[
+        {text:[{text:'เลขที่ '},{text:docno,bold:true}], alignment:'right'},
+        {text:'ลงวันที่'+date, alignment:'right'}
+      ], fontSize:10}
     ], margin:[0,0,0,8]
-  };
-  docBody.push(hdrContent);
-  docBody.push({canvas:[{type:'line',x1:0,y1:0,x2:481,y2:0,lineWidth:0.8,lineColor:'#333'}], margin:[0,0,0,10]});
+  });
+  docBody.push({canvas:[{type:'line',x1:0,y1:0,x2:481,y2:0,lineWidth:0.8}], margin:[0,0,0,10]});
 
-  // Title
-  docBody.push({text:'บันทึกข้อความ', fontSize:16, bold:true, alignment:'center', margin:[0,0,0,12], characterSpacing:1});
+  // 2. Title
+  docBody.push({text:'บันทึกข้อความ', fontSize:16, bold:true, alignment:'center',
+    margin:[0,0,0,12], characterSpacing:1});
 
-  // เรื่อง/เรียน
-  docBody.push({columns:[{text:'เรื่อง', bold:true, width:55, fontSize:10},{text:subject, fontSize:10}], margin:[0,0,0,4]});
-  docBody.push({columns:[{text:'เรียน', bold:true, width:55, fontSize:10},{text:to, fontSize:10}], margin:[0,0,0,10]});
+  // 3. เรื่อง/เรียน
+  docBody.push({columns:[{text:'เรื่อง',bold:true,width:55},{text:subj}], margin:[0,0,0,4]});
+  docBody.push({columns:[{text:'เรียน',bold:true,width:55},{text:to}], margin:[0,0,0,10]});
 
-  // Body
-  const bodyText = bodyEl ? bodyEl.innerText.trim() : '';
-  if(bodyText) docBody.push({text:bodyText, fontSize:10, lineHeight:1.5, margin:[0,0,0,8]});
+  // 4. Body text
+  const bodyText = bodyEl?bodyEl.innerText.trim():'';
+  if(bodyText) docBody.push({text:bodyText, lineHeight:1.5, margin:[0,0,0,8]});
 
-  // Tables
-  tables.forEach(t => {
-    const tableBody = [t.headers, ...t.bodyRows];
-    t.footRows.forEach(r => tableBody.push(r));
-    docBody.push({table:{headerRows:1, widths:Array(t.colCount).fill('*'), body:tableBody}, margin:[0,4,0,6]});
+  // 5. Tables (main + account)
+  document.getElementById('pdf-table-wrap').querySelectorAll('table').forEach(tbl=>{
+    const t = htmlTableToPdf(tbl);
+    if(t) docBody.push(t);
   });
 
-  // Note
-  if(noteEl && noteEl.style.display !== 'none' && noteEl.innerText.trim()){
-    docBody.push({text:noteEl.innerText.trim(), fontSize:8.5, color:'#444', margin:[0,4,0,8], alignment:'center'});
+  // 6. Note
+  if(noteEl && noteEl.style.display!=='none' && noteEl.innerText.trim()){
+    docBody.push({text:noteEl.innerText.trim(), fontSize:8.5, color:'#444',
+      margin:[0,4,0,8], alignment:'center'});
   }
 
-  // Account
-  if(acctVisible){
-    acctWrap.querySelectorAll('table').forEach(tbl => {
-      const hdrs = Array.from(tbl.querySelectorAll('thead th')).map(th=>({text:th.textContent.trim(),bold:true,fillColor:'#d0d0d0',alignment:'center',fontSize:9}));
-      const rows = Array.from(tbl.querySelectorAll('tbody tr')).map(tr=>Array.from(tr.querySelectorAll('td')).map(td=>({text:td.textContent.trim(),alignment:td.classList.contains('tdl')?'left':'center',fontSize:9})));
-      if(hdrs.length) docBody.push({table:{headerRows:1,widths:Array(hdrs.length).fill('*'),body:[hdrs,...rows]},margin:[0,4,0,8]});
+  // 7. Account table
+  const acctWrap = document.getElementById('pdf-acct-wrap');
+  if(acctWrap && acctWrap.style.display!=='none'){
+    acctWrap.querySelectorAll('table').forEach(tbl=>{
+      const t = htmlTableToPdf(tbl);
+      if(t) docBody.push(t);
     });
   }
 
-  // Closing
-  const closingText = closingEl ? closingEl.innerText.trim() : '';
-  if(closingText) docBody.push({text:closingText, fontSize:9.5, lineHeight:1.5, margin:[0,8,0,10]});
+  // 8. Closing
+  const closingText = closingEl?closingEl.innerText.trim():'';
+  if(closingText) docBody.push({text:closingText, fontSize:9.5, lineHeight:1.5,
+    margin:[0,8,0,10]});
 
-  // Approval table
-  if(cells.length === 2){
-    const buildCell = (el) => {
+  // 9. Approval box
+  const approvalEl = document.getElementById('pdf-approval');
+  const cells = approvalEl?Array.from(approvalEl.querySelectorAll('.mp-appr-cell')):[];
+  if(cells.length===2){
+    const buildCell = (el)=>{
       const lines = el.innerText.trim().split('\n').map(l=>l.trim()).filter(l=>l);
-      const stack = [];
-      // Find where signature line starts (after "o อื่นๆ" line)
-      const sigIdx = lines.findIndex(l => l.startsWith('o อื่นๆ'));
-      const topLines = lines.slice(0, sigIdx > -1 ? sigIdx+1 : Math.min(4, lines.length));
-      const botLines = lines.slice(topLines.length);
-      topLines.forEach(l => stack.push({text:l, fontSize:9, margin:[0,1,0,1]}));
-      stack.push({text:' ', margin:[0,12,0,0]});
-      stack.push({canvas:[{type:'line',x1:10,y1:0,x2:200,y2:0,lineWidth:0.5}]});
-      botLines.forEach(l => stack.push({text:l, fontSize:9, alignment:'center', bold:l.includes('('), margin:[0,1,0,1]}));
-      return {stack, margin:[6,6,6,6]};
+      // Split: top lines = before sig line, bot = after
+      const sigIdx = lines.findIndex(l=>l.startsWith('('));
+      const top = sigIdx>-1 ? lines.slice(0,sigIdx) : lines.slice(0,-3);
+      const bot = sigIdx>-1 ? lines.slice(sigIdx) : lines.slice(-3);
+      return {
+        stack:[
+          ...top.map(l=>({text:l, fontSize:9, margin:[0,1,0,1]})),
+          {text:' ', margin:[0,14,0,0]},
+          {canvas:[{type:'line',x1:10,y1:0,x2:195,y2:0,lineWidth:0.5}]},
+          ...bot.map(l=>({text:l, fontSize:9, alignment:'center',
+            bold:l.startsWith('(')&&l.endsWith(')'), margin:[0,2,0,1]}))
+        ],
+        margin:[8,8,8,8]
+      };
     };
     docBody.push({
-      table:{widths:['50%','50%'], body:[[buildCell(cells[0]), buildCell(cells[1])]]},
-      margin:[0,4,0,0]
+      table:{widths:['50%','50%'], body:[[buildCell(cells[0]),buildCell(cells[1])]]},
+      margin:[0,0,0,0], pageBreak:'before'
     });
+    // Remove pageBreak:'before' and use keepWithContent or just no break
+    // Actually - let pdfmake decide, just use unbreakable table
+    docBody[docBody.length-1].pageBreak = undefined;
+    docBody[docBody.length-1].unbreakable = true;
   }
 
-  const docDefinition = {
+  // 10. Footer company (inline, appears after approval on last page)
+  docBody.push({
+    stack:[
+      {canvas:[{type:'line',x1:0,y1:0,x2:481,y2:0,lineWidth:0.5,lineColor:'#888'}]},
+      {text:'บริษัท ออร์บิท ดิจิทัล จำกัด', bold:true, alignment:'center', fontSize:9, margin:[0,4,0,0]},
+      {text:'51 ถนนนราธิวาสราชนครินทร์ แขวงสีลม เขตบางรัก กรุงเทพมหานคร',
+        alignment:'center', fontSize:8, color:'#555'}
+    ],
+    margin:[0,16,0,0]
+  });
+
+  const docDef = {
     pageSize:'A4',
-    pageMargins:[57, 75, 57, 65],
-    defaultStyle:{font:useFont, fontSize:10, lineHeight:1.4},
-    header:(currentPage)=>({
-      columns:[
-        logoDataUrl?{image:logoDataUrl,width:55,height:22,margin:[57,8,0,0]}:{text:'',margin:[57,8,0,0]},
-        {text:'บริษัท ออร์บิท ดิจิทัล จำกัด', alignment:'right', fontSize:8, color:'#555', margin:[0,12,57,0], font:useFont}
-      ]
-    }),
-    footer:()=>({
-      stack:[
-        {canvas:[{type:'line',x1:57,y1:0,x2:538,y2:0,lineWidth:0.5,lineColor:'#888'}]},
-        {text:'บริษัท ออร์บิท ดิจิทัล จำกัด', alignment:'center', bold:true, fontSize:9, margin:[0,3,0,0], font:useFont},
-        {text:'51 ถนนนราธิวาสราชนครินทร์ แขวงสีลม เขตบางรัก กรุงเทพมหานคร', alignment:'center', fontSize:8, color:'#555', font:useFont}
-      ], margin:[0,4,0,0]
-    }),
+    pageMargins:[57,50,57,40],
+    defaultStyle:{font:F, fontSize:10, lineHeight:1.4},
     content:docBody
   };
 
-  pdfMake.createPdf(docDefinition).download(filename);
+  pdfMake.createPdf(docDef).download(filename);
 }
 
 
