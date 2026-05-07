@@ -894,8 +894,7 @@ async function generatePDFMake(tab, filename){
   const hdrContent = {
     columns: [
       logoDataUrl ? {image:logoDataUrl, width:70, height:28, margin:[0,0,0,0]} : {text:''},
-      {text:[{text:'เลขที่ ', fontSize:10},{text:docno, bold:true, fontSize:10},'
-',{text:'ลงวันที่'+date, fontSize:10}], alignment:'right'}
+      {text:[{text:'เลขที่ ', fontSize:10},{text:docno, bold:true, fontSize:10},{text:'\nลงวันที่'+date, fontSize:10}], alignment:'right'}
     ], margin:[0,0,0,8]
   };
   docBody.push(hdrContent);
@@ -940,8 +939,7 @@ async function generatePDFMake(tab, filename){
   // Approval table
   if(cells.length === 2){
     const buildCell = (el) => {
-      const lines = el.innerText.trim().split('
-').map(l=>l.trim()).filter(l=>l);
+      const lines = el.innerText.trim().split('\n').map(l=>l.trim()).filter(l=>l);
       const stack = [];
       // Find where signature line starts (after "o อื่นๆ" line)
       const sigIdx = lines.findIndex(l => l.startsWith('o อื่นๆ'));
