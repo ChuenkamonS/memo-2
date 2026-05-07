@@ -1016,10 +1016,22 @@ async function go(tab,doPrint){
       const html=document.querySelector('.memo-page')?.innerHTML||'';
       t2.style.cssText='';t2.style.display='none';
 
+      // Get logo as base64
+      let logoBase64='';
+      try{
+        const logoImg=document.getElementById('pdf-logo');
+        if(logoImg&&logoImg.complete&&logoImg.naturalWidth>0){
+          const c=document.createElement('canvas');
+          c.width=logoImg.naturalWidth;c.height=logoImg.naturalHeight;
+          c.getContext('2d').drawImage(logoImg,0,0);
+          logoBase64=c.toDataURL('image/png');
+        }
+      }catch(e){}
+
       const resp=await fetch('https://memo-pdf-server.onrender.com/generate-pdf',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({html, filename})
+        body:JSON.stringify({html, filename, logoBase64})
       });
       if(!resp.ok) throw new Error('Server error '+resp.status);
       const blob=await resp.blob();
