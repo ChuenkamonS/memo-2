@@ -87,8 +87,8 @@ button.secondary:hover{background:#E6F1FB}
 .memo-page{font-family:'Sarabun New','TH Sarabun New','Sarabun',serif;font-size:10pt;color:#000;background:#fff;padding:20px 40px 60px;max-width:820px;margin:0 auto;line-height:1.75}
 .mp-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
 .mp-logo{max-height:64px;max-width:150px;object-fit:contain}
-.mp-hdr-right{text-align:right;font-size:10pt;line-height:2}
-.mp-hdr-right .num{text-decoration:underline;font-weight:700}
+.mp-hdr-right,.mp-doc-meta{text-align:right;font-size:10pt;line-height:2}
+.mp-hdr-right .num,.mp-doc-meta .num{text-decoration:underline;font-weight:700}
 .mp-title{text-align:center;font-size:16pt;font-weight:700;letter-spacing:1px;margin-bottom:20px}
 .mp-field{display:flex;gap:0;margin-bottom:6px;font-size:10pt;line-height:1.8}
 .mp-field-label{font-weight:700;min-width:80px}
@@ -421,10 +421,10 @@ button.secondary:hover{background:#E6F1FB}
   <div class="mp-hdr">
     <!-- Fix #8: use Picture1.png -->
     <img id="pdf-logo" class="mp-logo" src="Picture1.png" alt="Orbit Digital" onerror="this.style.display='none'">
-    <div class="mp-hdr-right">
-      <div>เลขที่ <span style="font-weight:700" id="pdf-docno"></span></div>
-      <div>ลงวันที่<span id="pdf-date"></span></div>
-    </div>
+  </div>
+  <div class="mp-doc-meta">
+    <div>เลขที่ <span style="font-weight:700" id="pdf-docno"></span></div>
+    <div>ลงวันที่<span id="pdf-date"></span></div>
   </div>
   <div class="mp-title">บันทึกข้อความ</div>
   <div class="mp-field"><span class="mp-field-label">เรื่อง&nbsp;&nbsp;&nbsp;</span><span class="mp-field-value" id="pdf-subject"></span></div>
@@ -907,7 +907,11 @@ async function generatePDFMake(tab, filename){
       return row;
     });
     if(!hdrs.length) return null;
-    return {table:{headerRows:1,widths:Array(hdrs.length).fill('*'),body:[hdrs,...rows,...foot]},margin:[0,4,0,6]};
+    return {
+      table:{headerRows:1,widths:Array(hdrs.length).fill('*'),body:[hdrs,...rows,...foot],dontBreakRows:true,keepWithHeaderRows:1},
+      margin:[0,4,0,6],
+      unbreakable:true
+    };
   }
 
   // Gather tables
@@ -959,7 +963,11 @@ async function generatePDFMake(tab, filename){
   // Build document
   const docBody = [];
 
+<<<<<<< codex/add-logo-to-header-and-footer-0vkk7c
+  // Memo number/date stay in the memo body like the original layout.
+=======
   // Memo reference lines stay in the document; the company logo is supplied by docDef.header on every page.
+>>>>>>> main
   docBody.push({
     stack:[
       {text:[{text:'เลขที่ '},{text:docno,bold:true}],alignment:'right'},
@@ -994,21 +1002,43 @@ async function generatePDFMake(tab, filename){
 
   const docDef = {
     pageSize:'A4',
+<<<<<<< codex/add-logo-to-header-and-footer-0vkk7c
+    pageMargins:[57,52,57,36],
+    defaultStyle:{font:F,fontSize:10,lineHeight:1.4},
+    header: () => ({
+      stack:[
+        {
+          columns:[
+            logoDataUrl ? {image:logoDataUrl,width:72,margin:[57,10,0,0]} : {text:'Orbit Digital',bold:true,margin:[57,12,0,0],fontSize:9},
+            {text:'บริษัท ออร์บิท ดิจิทัล จำกัด',alignment:'right',color:'#555',fontSize:8,margin:[0,13,57,0]}
+          ]
+        },
+        {canvas:[{type:'line',x1:57,y1:0,x2:538,y2:0,lineWidth:0.5,lineColor:'#888'}],margin:[0,4,0,0]}
+=======
     pageMargins:[57,80,57,64],
     defaultStyle:{font:F,fontSize:10,lineHeight:1.4},
     header: () => ({
       columns:[
         logoDataUrl ? {image:logoDataUrl,width:92,margin:[57,16,0,0]} : {text:'Orbit Digital',bold:true,margin:[57,20,0,0],fontSize:9},
         {text:'บริษัท ออร์บิท ดิจิทัล จำกัด',alignment:'right',color:'#555',fontSize:8,margin:[0,22,57,0]}
+>>>>>>> main
       ]
     }),
     footer: () => ({
       stack:[
+<<<<<<< codex/add-logo-to-header-and-footer-0vkk7c
+        {canvas:[{type:'line',x1:57,y1:0,x2:538,y2:0,lineWidth:0.5,lineColor:'#888'}],margin:[0,0,0,3]},
+        {text:'บริษัท ออร์บิท ดิจิทัล จำกัด',bold:true,alignment:'center',fontSize:8.5},
+        {text:'51 ถนนนราธิวาสราชนครินทร์ แขวงสีลม เขตบางรัก กรุงเทพมหานคร',alignment:'center',fontSize:7.5,color:'#555'}
+      ],
+      margin:[0,6,0,0]
+=======
         {canvas:[{type:'line',x1:57,y1:0,x2:538,y2:0,lineWidth:0.5,lineColor:'#888'}],margin:[0,0,0,4]},
         {text:'บริษัท ออร์บิท ดิจิทัล จำกัด',bold:true,alignment:'center',fontSize:9},
         {text:'51 ถนนนราธิวาสราชนครินทร์ แขวงสีลม เขตบางรัก กรุงเทพมหานคร',alignment:'center',fontSize:8,color:'#555'}
       ],
       margin:[0,4,0,0]
+>>>>>>> main
     }),
     content:docBody
   };
