@@ -1028,7 +1028,7 @@ async function go(tab,doPrint){
         }
       }catch(e){}
 
-      // Retry up to 2x with 55s timeout — handles Render.com cold start (~30s)
+      // Retry up to 2x with 55s timeout — handles Render.com cold start
       async function fetchWithRetry(url,options,timeoutMs=55000,retries=2){
         for(let attempt=0;attempt<=retries;attempt++){
           const controller=new AbortController();
@@ -1048,9 +1048,9 @@ async function go(tab,doPrint){
       const resp=await fetchWithRetry('https://memo-pdf-server.onrender.com/generate-pdf',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({html, filename, logoBase64})
+        body:JSON.stringify({html,filename,logoBase64})
       });
-      if(!resp.ok) throw new Error('Server error '+resp.status);
+      if(!resp.ok)throw new Error('Server error '+resp.status);
       const blob=await resp.blob();
       const url=URL.createObjectURL(blob);
       const a=document.createElement('a');
@@ -1070,6 +1070,9 @@ async function go(tab,doPrint){
     });
   }
 }
+// Keep Render server alive — ping every 4 minutes so it never cold-starts
+const PDF_SERVER='https://memo-pdf-server.onrender.com';
+setInterval(()=>fetch(PDF_SERVER+'/ping').catch(()=>{}), 4*60*1000);
 </script>
 </body>
 </html>
