@@ -1028,7 +1028,24 @@ async function go(tab,doPrint){
         }
       }catch(e){}
 
-      const resp=await fetch('https://memo-pdf-server.onrender.com/generate-pdf',{
+      // Retry up to 2x with 55s timeout — handles Render.com cold start (~30s)
+      async function fetchWithRetry(url,options,timeoutMs=55000,retries=2){
+        for(let attempt=0;attempt<=retries;attempt++){
+          const controller=new AbortController();
+          const timer=setTimeout(()=>controller.abort(),timeoutMs);
+          try{
+            if(attempt>0&&btn)btn.textContent=`⏳ กำลัง Generate... (ครั้งที่ ${attempt+1})`;
+            const r=await fetch(url,{...options,signal:controller.signal});
+            clearTimeout(timer);
+            return r;
+          }catch(e){
+            clearTimeout(timer);
+            if(attempt===retries)throw e;
+            await new Promise(r=>setTimeout(r,2000));
+          }
+        }
+      }
+      const resp=await fetchWithRetry('https://memo-pdf-server.onrender.com/generate-pdf',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({html, filename, logoBase64})
