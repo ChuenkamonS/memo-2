@@ -192,7 +192,8 @@ button.secondary:hover{background:#E6F1FB}
     </div>
     <div class="sec">Reviewer</div>
     <div class="grid">
-      <div class="card"><label>ชื่อผู้จัดการโครงการ *</label><input type="text" id="sl-pm" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>ชื่อ Reviewer *</label><input type="text" id="sl-pm" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>ตำแหน่ง Reviewer *</label><input type="text" id="sl-pmrole" value="ผู้จัดการโครงการ"></div>
       <div class="card"><label>วันที่ลงนาม *</label><input type="date" id="sl-signdate"></div>
     </div>
     <div class="sec">Approver</div>
@@ -238,7 +239,8 @@ button.secondary:hover{background:#E6F1FB}
     </div>
     <div class="sec">Reviewer</div>
     <div class="grid">
-      <div class="card"><label>ชื่อผู้จัดการโครงการ *</label><input type="text" id="int-pm" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>ชื่อ Reviewer *</label><input type="text" id="int-pm" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>ตำแหน่ง Reviewer *</label><input type="text" id="int-pmrole" value="ผู้จัดการโครงการ"></div>
       <div class="card"><label>วันที่ลงนาม *</label><input type="date" id="int-signdate"></div>
     </div>
     <div class="sec">Approver</div>
@@ -285,7 +287,8 @@ button.secondary:hover{background:#E6F1FB}
     </div>
     <div class="sec">Reviewer</div>
     <div class="grid">
-      <div class="card"><label>ชื่อผู้จัดการโครงการ *</label><input type="text" id="hw-pm" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>ชื่อ Reviewer *</label><input type="text" id="hw-pm" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>ตำแหน่ง Reviewer *</label><input type="text" id="hw-pmrole" value="ผู้จัดการโครงการ"></div>
       <div class="card"><label>วันที่ลงนาม *</label><input type="date" id="hw-signdate"></div>
     </div>
     <div class="sec">Approver</div>
@@ -320,7 +323,8 @@ button.secondary:hover{background:#E6F1FB}
 
     <div class="sec">Reviewer</div>
     <div class="grid">
-      <div class="card"><label>ชื่อผู้จัดการโครงการ *</label><input type="text" id="ent-pm" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>ชื่อ Reviewer *</label><input type="text" id="ent-pm" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>ตำแหน่ง Reviewer *</label><input type="text" id="ent-pmrole" value="ผู้จัดการโครงการ"></div>
       <div class="card"><label>วันที่ลงนาม *</label><input type="date" id="ent-signdate"></div>
     </div>
     <div class="sec">Approver</div>
@@ -388,7 +392,8 @@ button.secondary:hover{background:#E6F1FB}
     </div>
     <div class="sec">Reviewer</div>
     <div class="grid">
-      <div class="card"><label>ชื่อผู้จัดการโครงการ *</label><input type="text" id="dep-pm" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>ชื่อ Reviewer *</label><input type="text" id="dep-pm" placeholder="กรุณากรอกชื่อ-นามสกุล"></div>
+      <div class="card"><label>ตำแหน่ง Reviewer *</label><input type="text" id="dep-pmrole" value="ผู้จัดการโครงการ"></div>
       <div class="card"><label>วันที่ลงนาม *</label><input type="date" id="dep-signdate"></div>
     </div>
     <div class="sec">Approver</div>
@@ -666,7 +671,7 @@ const FILL={
     } else document.getElementById('pdf-acct-wrap').style.display='none';
     const seats=lics.reduce((s,l)=>s+l.qty,0),maxM=Math.max(...lics.map(l=>l.months));
     document.getElementById('pdf-closing').textContent=`ในการนี้จึงขอให้ท่านโปรดพิจารณาอนุมัติงบประมาณสำหรับค่าใช้จ่ายดังกล่าว ซึ่งเป็นค่าใช้จ่ายซื้อ ${(lics.length===1?lics[0].name:lics.length===2?`${lics[0].name} และ ${lics[1].name}`:`${lics.slice(0,-1).map(l=>l.name).join(', ')} และ ${lics[lics.length-1].name}`)} จำนวนรวมทั้งหมด ${seats} Seats ระยะเวลา ${maxM} เดือน รวมเป็นจำนวนเงินไม่เกิน ${total.toLocaleString('th-TH')} บาท ${v('sl-amttext')?'('+v('sl-amttext')+') ':''} อ้างอิงอำนาจอนุมัติจากคู่มืออำนาจอนุมัติ พ.ศ. 2566 ข้อ 3.2 การชำระเงิน (ที่มีการตั้งงบประมาณไว้) หมวดการชำระค่าบริการ ซึ่งให้อำนาจแก่${v('sl-to')}ในวงเงินไม่เกิน 2,000,000 บาท`;
-    setApproval(pm,'ผู้จัดการโครงการ',fmtShort(v('sl-signdate')),v('sl-ceo'),v('sl-ceotitle'),fmtShort(v('sl-ceo-signdate')),v('sl-to'));
+    setApproval(pm,v('sl-pmrole')||'ผู้จัดการโครงการ',fmtShort(v('sl-signdate')),v('sl-ceo'),v('sl-ceotitle'),fmtShort(v('sl-ceo-signdate')),v('sl-to'));
     return true;
   },
   int(){
@@ -681,7 +686,7 @@ const FILL={
     document.getElementById('pdf-body').innerHTML=`<p style="text-indent:3em">เนื่องด้วย ทีม ${project} บริษัท ออร์บิท ดิจิทัล จำกัด ได้วางแผนจัดทำกิจกรรมทีมประจำ${v('int-quarter')||'ไตรมาส'} ร่วมกันภายในแผนก${reason?'เพื่อ'+reason:''} โดยกำหนดงบประมาณค่าใช้จ่ายเพื่อทำกิจกรรมทีม ในวันที่ ${fmtDate(v('int-actdate'))} วงเงินไม่เกินท่านละ ${perPax.toLocaleString('th-TH')} บาท (${v('int-amttext')||perPax.toLocaleString('th-TH')+' บาทถ้วน'}) สำหรับรายชื่อผู้เข้าร่วมกิจกรรม จำนวนทั้งหมด ${names.length} คน ได้แก่</p>`;
     document.getElementById('pdf-table-wrap').innerHTML=`<table class="mp-table"><thead><tr><th style="width:8%">ลำดับ</th><th>รายชื่อผู้เข้าร่วมกิจกรรม</th></tr></thead><tbody>${names.map((n,i)=>`<tr><td>${i+1}</td><td class="tdl">${n}</td></tr>`).join('')}</tbody></table>`;
     document.getElementById('pdf-closing').textContent=`ในการนี้จึงขอให้ท่านโปรดพิจารณาอนุมัติงบประมาณสำหรับค่ากิจกรรมทีม ${project} เพื่อใช้จัดกิจกรรมดังกล่าว เป็นวงเงินจำนวนไม่เกิน ${total.toLocaleString('th-TH')} บาท${v('int-amttext')?' ('+v('int-amttext')+')':''}`;
-    setApproval(pm,'ผู้จัดการโครงการ',fmtShort(v('int-signdate')),v('int-dir'),v('int-dirtitle'),fmtShort(v('int-dir-signdate')),v('int-to'));
+    setApproval(pm,v('int-pmrole')||'ผู้จัดการโครงการ',fmtShort(v('int-signdate')),v('int-dir'),v('int-dirtitle'),fmtShort(v('int-dir-signdate')),v('int-to'));
     return true;
   },
   hw(){
@@ -697,7 +702,7 @@ const FILL={
     const rows=items.map((it,i)=>{const a=it.price*it.qty;total+=a;return`<tr><td>${i+1}</td><td class="tdl">${it.name}</td><td>${it.price.toLocaleString('th-TH')}</td><td>${it.qty}</td><td>${a.toLocaleString('th-TH')}</td></tr>`;}).join('');
     document.getElementById('pdf-table-wrap').innerHTML=`<table class="mp-table"><thead><tr><th>No</th><th>รายการ</th><th>ราคา/ชิ้น (THB)</th><th>จำนวน (ชิ้น)</th><th>Amount (THB)</th></tr></thead><tbody>${rows}</tbody><tfoot><tr class="tr-total"><td colspan="4" style="text-align:right;font-weight:700">Total Amount</td><td>${total.toLocaleString('th-TH')}</td></tr></tfoot></table>`;
     document.getElementById('pdf-closing').textContent=`ในการนี้จึงขอให้ท่านโปรดพิจารณาอนุมัติงบประมาณสำหรับค่าใช้จ่ายจัดซื้ออุปกรณ์ Hardware ดังกล่าว รวมเป็นจำนวนเงินไม่เกิน ${total.toLocaleString('th-TH')} บาท${v('hw-amttext')?' ('+v('hw-amttext')+')':''}${v('hw-custodian')?' โดยมอบหมายให้ '+v('hw-custodian')+' เป็นผู้รับผิดชอบดูแลอุปกรณ์':''} อ้างอิงอำนาจอนุมัติจากคู่มืออำนาจอนุมัติ พ.ศ. 2566 ข้อ 3.2 ซึ่งให้อำนาจแก่${v('hw-to')}ในวงเงินไม่เกิน 2,000,000 บาท`;
-    setApproval(pm,'ผู้จัดการโครงการ',fmtShort(v('hw-signdate')),v('hw-ceo'),v('hw-ceotitle'),fmtShort(v('hw-ceo-signdate')),v('hw-to'));
+    setApproval(pm,v('hw-pmrole')||'ผู้จัดการโครงการ',fmtShort(v('hw-signdate')),v('hw-ceo'),v('hw-ceotitle'),fmtShort(v('hw-ceo-signdate')),v('hw-to'));
     return true;
   },
   ent(){
@@ -713,7 +718,7 @@ const FILL={
     document.getElementById('pdf-body').innerHTML=`<p style="text-indent:3em">สืบเนื่องจากพนักงานโครงการ ${project} บริษัท ออร์บิท ดิจิทัล จำกัด ได้วางแผนจัดงานบริษัทเลี้ยงรับรองลูกค้าเพื่อขอบคุณ ซึ่งจะจัดวันที่ ${entDateStr} สถานที่จัดคือ ${v('ent-location')||'-'} จำนวนผู้เข้าร่วมโดยประมาณ ${v('ent-pax')||'-'} คน โดยกำหนดงบประมาณสำหรับค่าใช้จ่ายงานเลี้ยงรับรองลูกค้าเป็นจำนวนเงินไม่เกิน ${budget.toLocaleString('th-TH')} บาท</p>`;
     document.getElementById('pdf-table-wrap').innerHTML='';
     document.getElementById('pdf-closing').textContent=`ในการนี้จึงขอให้ท่านโปรดพิจารณาอนุมัติงบประมาณค่ารับรองลูกค้าจาก${customer}ในช่วงเวลาดังกล่าว อ้างอิงอำนาจอนุมัติจากคู่มืออำนาจอนุมัติ พ.ศ. 2564 ข้อ 3.2 การชำระเงิน (ที่มีการตั้งงบประมาณไว้) หมวดค่าเลี้ยงรับรอง วงเงินไม่เกิน 150,000 บาท ซึ่งให้อำนาจแก่${v('ent-to')}ในการอนุมัติการชำระเงินในวงเงินไม่เกิน 150,000 บาท${v('ent-amttext')?' ('+v('ent-amttext')+')':''}`;
-    setApproval(pm,'ผู้จัดการโครงการ',fmtShort(v('ent-signdate')),v('ent-ceo'),v('ent-ceotitle'),fmtShort(v('ent-ceo-signdate')),v('ent-to'));
+    setApproval(pm,v('ent-pmrole')||'ผู้จัดการโครงการ',fmtShort(v('ent-signdate')),v('ent-ceo'),v('ent-ceotitle'),fmtShort(v('ent-ceo-signdate')),v('ent-to'));
     return true;
   },
   dep(){
@@ -736,7 +741,7 @@ const FILL={
     const nameRows=names.map((n,i)=>`<tr><td>${i+1}</td><td class="tdl">${n}</td></tr>`).join('');
     document.getElementById('pdf-table-wrap').innerHTML=`<table class="mp-table"><thead><tr><th>No</th><th>ประเภทค่าใช้จ่าย</th><th>ราคา/คน (THB)</th><th>จำนวนคน</th><th>รวม (THB)</th></tr></thead><tbody>${expRows}</tbody><tfoot><tr class="tr-total"><td colspan="4" style="text-align:right;font-weight:700">ยอดรวมทั้งหมด</td><td>${total.toLocaleString('th-TH')}</td></tr></tfoot></table><br><table class="mp-table"><thead><tr><th style="width:8%">ลำดับ</th><th>รายชื่อพนักงาน</th></tr></thead><tbody>${nameRows}</tbody></table>`;
     document.getElementById('pdf-closing').textContent=`จึงขอความอนุเคราะห์อนุมัติการจัดซื้อสำหรับรายการข้างต้น ในวงเงิน ${total.toLocaleString('th-TH')} บาท${v('dep-amttext')?' ('+v('dep-amttext')+')':''} อ้างอิงอำนาจอนุมัติจากคู่มืออำนาจอนุมัติ พ.ศ. 2566 ข้อ 3.2 การชำระเงิน (ที่มีการตั้งงบประมาณไว้) หมวดการชำระค่าสวัสดิการพนักงาน ซึ่งให้อำนาจผู้อำนวยการในการอนุมัติการชำระเงินในวงเงินไม่เกิน ${v('dep-authlimit')||'500,000'} บาท`;
-    setApproval(pm,'ผู้จัดการโครงการ',fmtShort(v('dep-signdate')),v('dep-dir'),v('dep-dirtitle'),fmtShort(v('dep-dir-signdate')),v('dep-to'));
+    setApproval(pm,v('dep-pmrole')||'ผู้จัดการโครงการ',fmtShort(v('dep-signdate')),v('dep-dir'),v('dep-dirtitle'),fmtShort(v('dep-dir-signdate')),v('dep-to'));
     return true;
   }
 };
@@ -1028,29 +1033,12 @@ async function go(tab,doPrint){
         }
       }catch(e){}
 
-      // Retry up to 2x with 55s timeout — handles Render.com cold start
-      async function fetchWithRetry(url,options,timeoutMs=55000,retries=2){
-        for(let attempt=0;attempt<=retries;attempt++){
-          const controller=new AbortController();
-          const timer=setTimeout(()=>controller.abort(),timeoutMs);
-          try{
-            if(attempt>0&&btn)btn.textContent=`⏳ กำลัง Generate... (ครั้งที่ ${attempt+1})`;
-            const r=await fetch(url,{...options,signal:controller.signal});
-            clearTimeout(timer);
-            return r;
-          }catch(e){
-            clearTimeout(timer);
-            if(attempt===retries)throw e;
-            await new Promise(r=>setTimeout(r,2000));
-          }
-        }
-      }
-      const resp=await fetchWithRetry('https://memo-pdf-server.onrender.com/generate-pdf',{
+      const resp=await fetch('https://memo-pdf-server.onrender.com/generate-pdf',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({html,filename,logoBase64})
+        body:JSON.stringify({html, filename, logoBase64})
       });
-      if(!resp.ok)throw new Error('Server error '+resp.status);
+      if(!resp.ok) throw new Error('Server error '+resp.status);
       const blob=await resp.blob();
       const url=URL.createObjectURL(blob);
       const a=document.createElement('a');
@@ -1070,9 +1058,6 @@ async function go(tab,doPrint){
     });
   }
 }
-// Keep Render server alive — ping every 4 minutes so it never cold-starts
-const PDF_SERVER='https://memo-pdf-server.onrender.com';
-setInterval(()=>fetch(PDF_SERVER+'/ping').catch(()=>{}), 4*60*1000);
 </script>
 </body>
 </html>
